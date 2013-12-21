@@ -20,5 +20,6 @@ const (
 type Board [][]Square
 
 func NewBoard(compactBoard string) Board {
+
 	return Board{}
 }
