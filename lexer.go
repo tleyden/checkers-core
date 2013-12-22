@@ -2,7 +2,6 @@ package checkerscore
 
 import (
 	"fmt"
-	"github.com/couchbaselabs/logg"
 	"strings"
 	"unicode/utf8"
 )
@@ -94,7 +93,6 @@ func lex(name, input string) (*lexer, chan item) {
 // the state is nil.
 func (l *lexer) run() {
 	for state := lexOutsideRow; state != nil; {
-		logg.Log("run() called")
 		state = state(l)
 	}
 	close(l.items) // No more tokens will be delivered.
@@ -120,12 +118,10 @@ func (l *lexer) next() (rune rune) {
 func lexOutsideRow(l *lexer) stateFn {
 	for {
 		if strings.HasPrefix(l.input[l.pos:], pipe) {
-			logg.Log("Saw pipe, going from lexOutsideRow -> lexInsideRow")
 			l.next()
 			return lexInsideRow // Next state.
 		}
 		if l.next() == eof {
-			logg.Log("got eof, done")
 			break
 		}
 	}
@@ -138,19 +134,15 @@ func lexInsideRow(l *lexer) stateFn {
 
 	for {
 		if strings.HasPrefix(l.input[l.pos:], pipe) {
-			logg.Log("saw pipe, going from lexInsideRow -> lexOutsideRow")
 			l.next()
 			return lexOutsideRow // Next state.
 		}
 		switch r := l.next(); {
 		case r == eof || r == '\n':
-			logg.Log("error unclosed action")
 			return l.errorf("unclosed action")
 		case isSpace(r):
-			logg.Log("ignore space")
 			l.ignore()
 		case r == squareEmpty:
-			logg.Log("emit squareEmpty")
 			l.emit(itemSquareEmpty)
 			return lexInsideRow
 		case r == squareRed:
