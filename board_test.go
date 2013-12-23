@@ -23,7 +23,31 @@ func TestNewBoard(t *testing.T) {
 	assert.Equals(t, int(board[7][0]), int(BLACK))
 	assert.Equals(t, int(board[7][7]), int(EMPTY))
 
-	// etc...
+}
+
+func TestKingCanMoveBackwards(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - x - - - - -|" +
+		"|- - - O - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - X - - -|" +
+		"|- - - o - - - -|" +
+		"|- - - - - - - -|"
+	board := NewBoard(currentBoardStr)
+
+	// black king (O) move backwards
+	start := Location{row: 2, col: 3}
+	dest := Location{row: 1, col: 5}
+	assert.True(t, board.canMove(BLACK_PLAYER, start, dest))
+
+	// black king (O) jump backwards
+	start = Location{row: 2, col: 3}
+	intermediate := Location{row: 1, col: 2}
+	dest = Location{row: 0, col: 1}
+	assert.True(t, board.canJump(BLACK_PLAYER, start, intermediate, dest))
 
 }
 

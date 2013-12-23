@@ -1,7 +1,6 @@
 package checkerscore
 
 import (
-	"github.com/couchbaselabs/logg"
 	_ "github.com/couchbaselabs/logg"
 )
 
@@ -95,8 +94,6 @@ func (board Board) jumpMovesForLocation(player Player, loc Location) []Move {
 	playerKingPiece := getPlayerKingPiece(player)
 	playerPiece := getPlayerPiece(player)
 
-	logg.Log("%v", playerKingPiece)
-
 	piece := board.pieceAt(loc)
 	if piece != playerPiece && piece != playerKingPiece {
 		return moves
@@ -188,7 +185,6 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 		if board.pieceAt(start) == RED && isMovingDown(start, dest) {
 			return false // Regular red piece can only move up
 		}
-		logg.Log("not moving down ..")
 		intermediate := board.pieceAt(intermediate)
 		if intermediate != BLACK && intermediate != BLACK_KING {
 			return false // there is no black piece to jump
