@@ -74,21 +74,21 @@ func (board Board) LegalMoves(player Player) []Move {
 }
 
 func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
+	moves := []Move{}
 
-	/*
+	jumpMoves := board.jumpMovesForLocation(player, loc)
+	moves = append(moves, jumpMoves...)
 
-	   if (board[row][col] == player || board[row][col] == playerKing) {
-	       if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-	           moves.add(new CheckersMove(row, col, row+2, col+2));
-	       if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-	           moves.add(new CheckersMove(row, col, row-2, col+2));
-	       if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-	           moves.add(new CheckersMove(row, col, row+2, col-2));
-	       if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-	           moves.add(new CheckersMove(row, col, row-2, col-2));
-	   }
+	// only check for non-jump moves if we don't have any jump moves
+	if len(jumpMoves) == 0 {
+		nonJumpMoves := board.nonJumpMovesForLocation(player, loc)
+		moves = append(moves, nonJumpMoves...)
+	}
 
-	*/
+	return moves
+}
+
+func (board Board) jumpMovesForLocation(player Player, loc Location) []Move {
 
 	moves := []Move{}
 
@@ -98,14 +98,80 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	logg.Log("%v", playerKingPiece)
 
 	piece := board.pieceAt(loc)
-	if piece == playerPiece || piece == playerKingPiece {
-		if board.canJump(player, loc, downLeftOne(loc), downLeftTwo(loc)) {
-			moves = append(moves, Move{from: loc, to: downLeftTwo(loc)})
-		}
+	if piece != playerPiece && piece != playerKingPiece {
+		return moves
+	}
 
+	if board.canJump(player, loc, downLeftOne(loc), downLeftTwo(loc)) {
+		moves = append(moves, Move{from: loc, to: downLeftTwo(loc)})
+	}
+	if board.canJump(player, loc, upRightOne(loc), upRightTwo(loc)) {
+		moves = append(moves, Move{from: loc, to: upRightTwo(loc)})
+	}
+	if board.canJump(player, loc, downRightOne(loc), downRightTwo(loc)) {
+		moves = append(moves, Move{from: loc, to: downRightTwo(loc)})
+	}
+	if board.canJump(player, loc, upLeftOne(loc), upLeftTwo(loc)) {
+		moves = append(moves, Move{from: loc, to: upLeftTwo(loc)})
 	}
 
 	return moves
+
+}
+
+func (board Board) nonJumpMovesForLocation(player Player, loc Location) []Move {
+
+	moves := []Move{}
+
+	playerKingPiece := getPlayerKingPiece(player)
+	playerPiece := getPlayerPiece(player)
+
+	piece := board.pieceAt(loc)
+	if piece != playerPiece && piece != playerKingPiece {
+		return moves
+	}
+
+	if board.canMove(player, loc, downLeftOne(loc)) {
+		moves = append(moves, Move{from: loc, to: downLeftOne(loc)})
+	}
+	if board.canMove(player, loc, upRightOne(loc)) {
+		moves = append(moves, Move{from: loc, to: upRightOne(loc)})
+	}
+	if board.canMove(player, loc, downRightOne(loc)) {
+		moves = append(moves, Move{from: loc, to: downRightOne(loc)})
+	}
+	if board.canMove(player, loc, upLeftOne(loc)) {
+		moves = append(moves, Move{from: loc, to: upLeftOne(loc)})
+	}
+
+	return moves
+
+}
+
+func (board Board) canMove(player Player, start, dest Location) bool {
+
+	if dest.isOffBoard() {
+		return false
+	}
+
+	if board.pieceAt(dest) != EMPTY {
+		return false // already contains a piece
+	}
+
+	switch {
+	case player == RED_PLAYER:
+		if board.pieceAt(start) == RED && isMovingDown(start, dest) {
+			return false // Regular red piece can only move up
+		}
+		return true // move is legal
+	default: // BLACK_PLAYER
+		if board.pieceAt(start) == BLACK && isMovingUp(start, dest) {
+			return false // Regular black piece can only move down
+		}
+		return true // move is legal
+	}
+
+	return false
 }
 
 func (board Board) canJump(player Player, start, intermediate, dest Location) bool {
@@ -128,7 +194,7 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 			return false // there is no black piece to jump
 		}
 		return true // jump is legal
-	case player == BLACK_PLAYER:
+	default: // BLACK_PLAYER
 		if board.pieceAt(start) == BLACK && isMovingUp(start, dest) {
 			return false // Regular black piece can only move down
 		}
@@ -137,9 +203,6 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 			return false // there is no red piece to jump
 		}
 		return true // jump is legal
-	default:
-		panic("Invalid player")
-		return false
 	}
 
 }
@@ -161,6 +224,39 @@ func downLeftTwo(loc Location) Location {
 	return downLeftOne(downLeftOne(loc))
 }
 
+func downRightOne(loc Location) Location {
+	return Location{
+		row: loc.row + 1,
+		col: loc.col - 1,
+	}
+}
+
+func downRightTwo(loc Location) Location {
+	return downRightOne(downRightOne(loc))
+}
+
+func upLeftOne(loc Location) Location {
+	return Location{
+		row: loc.row - 1,
+		col: loc.col - 1,
+	}
+}
+
+func upLeftTwo(loc Location) Location {
+	return upLeftOne(upLeftOne(loc))
+}
+
+func upRightOne(loc Location) Location {
+	return Location{
+		row: loc.row - 1,
+		col: loc.col + 1,
+	}
+}
+
+func upRightTwo(loc Location) Location {
+	return upRightOne(upRightOne(loc))
+}
+
 func isMovingDown(start, dest Location) bool {
 	return dest.row > start.row
 }
@@ -173,10 +269,7 @@ func getPlayerPiece(player Player) Piece {
 	switch {
 	case player == RED_PLAYER:
 		return RED
-	case player == BLACK_PLAYER:
-		return BLACK
-	default:
-		panic("Invalid player")
+	default: // BLACK_PLAYER
 		return BLACK
 	}
 }
@@ -185,10 +278,7 @@ func getPlayerKingPiece(player Player) Piece {
 	switch {
 	case player == RED_PLAYER:
 		return RED_KING
-	case player == BLACK_PLAYER:
-		return BLACK_KING
-	default:
-		panic("Invalid player")
+	default: // BLACK_PLAYER
 		return BLACK_KING
 	}
 }
