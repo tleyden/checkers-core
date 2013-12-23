@@ -56,3 +56,8 @@ func NewBoard(compactBoard string) Board {
 
 	return board
 }
+
+func (b Board) LegalMoves(player Player) []Move {
+
+	return []Move{}
+}
