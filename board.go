@@ -6,7 +6,7 @@ import (
 )
 
 // the possible contents of a square
-type Square int
+type Piece int
 
 const (
 	EMPTY      = 0
@@ -23,7 +23,7 @@ const (
 	BLACK_PLAYER = 1
 )
 
-type Board [8][8]Square
+type Board [8][8]Piece
 
 func NewBoard(compactBoard string) Board {
 
@@ -64,16 +64,16 @@ func (board Board) LegalMoves(player Player) []Move {
 
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
-			square := board[row][col]
-			movesForSquare := board.legalMovesForSquare(player, square)
-			moves = append(moves, movesForSquare...)
+			location := Location{row: row, col: col}
+			movesForLocation := board.legalMovesForLocation(player, location)
+			moves = append(moves, movesForLocation...)
 		}
 	}
 
 	return moves
 }
 
-func (board Board) legalMovesForSquare(player Player, square Square) []Move {
+func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 
 	/*
 
@@ -92,20 +92,84 @@ func (board Board) legalMovesForSquare(player Player, square Square) []Move {
 
 	moves := []Move{}
 
-	playerKingSquare := getPlayerKing(player)
-	playerSquare := getPlayerSquare(player)
+	playerKingPiece := getPlayerKingPiece(player)
+	playerPiece := getPlayerPiece(player)
 
-	logg.Log("%v", playerKingSquare)
+	logg.Log("%v", playerKingPiece)
 
-	if square == playerSquare || square == playerKingSquare {
+	piece := board.pieceAt(loc)
+	if piece == playerPiece || piece == playerKingPiece {
+		if board.canJump(player, loc, downLeftOne(loc), downLeftTwo(loc)) {
+			moves = append(moves, Move{from: loc, to: downLeftTwo(loc)})
+		}
 
-		// ...
 	}
 
 	return moves
 }
 
-func getPlayerSquare(player Player) Square {
+func (board Board) canJump(player Player, start, intermediate, dest Location) bool {
+
+	if dest.isOffBoard() {
+		return false
+	}
+
+	if board.pieceAt(dest) != EMPTY {
+		return false // already contains a piece
+	}
+
+	switch {
+	case player == RED_PLAYER:
+		if board.pieceAt(start) == RED && isMovingDown(start, dest) {
+			return false // Regular red piece can only move up
+		}
+		intermediate := board.pieceAt(intermediate)
+		if intermediate != BLACK && intermediate != BLACK_KING {
+			return false // there is no black piece to jump
+		}
+		return true // jump is legal
+	case player == BLACK_PLAYER:
+		if board.pieceAt(start) == BLACK && isMovingUp(start, dest) {
+			return false // Regular black piece can only move down
+		}
+		intermediate := board.pieceAt(intermediate)
+		if intermediate != RED && intermediate != RED_KING {
+			return false // there is no red piece to jump
+		}
+		return true // jump is legal
+	default:
+		panic("Invalid player")
+		return false
+	}
+
+}
+
+func (board Board) pieceAt(loc Location) Piece {
+	return board[loc.row][loc.col]
+}
+
+// one square "down" (row increasing) and to the "left" from the perspective
+// of the piece moving downwards (col increasing)
+func downLeftOne(loc Location) Location {
+	return Location{
+		row: loc.row + 1,
+		col: loc.col + 1,
+	}
+}
+
+func downLeftTwo(loc Location) Location {
+	return downLeftOne(downLeftOne(loc))
+}
+
+func isMovingDown(start, dest Location) bool {
+	return dest.row > start.row
+}
+
+func isMovingUp(start, dest Location) bool {
+	return dest.row < start.row
+}
+
+func getPlayerPiece(player Player) Piece {
 	switch {
 	case player == RED_PLAYER:
 		return RED
@@ -117,7 +181,7 @@ func getPlayerSquare(player Player) Square {
 	}
 }
 
-func getPlayerKing(player Player) Square {
+func getPlayerKingPiece(player Player) Piece {
 	switch {
 	case player == RED_PLAYER:
 		return RED_KING

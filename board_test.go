@@ -27,53 +27,52 @@ func TestNewBoard(t *testing.T) {
 
 }
 
-func TestLegalMoves(t *testing.T) {
+func TestCanJump(t *testing.T) {
 
-	// x == red piece
-	// X == red king
-	// o == black piece
-	// O == black king
-	// - == unoccupied square (may be legal dark or illegal white)
 	currentBoardStr := "" +
-		"|- x - x - x - x|" +
-		"|x - x - x - x -|" +
-		"|- x - x - x - x|" +
-		"|- - - - - - - -|" +
-		"|- - - - - - - -|" +
+		"|- o - o - o - o|" +
 		"|o - o - o - o -|" +
 		"|- o - o - o - o|" +
-		"|o - o - o - o -|"
+		"|- - - - x - - -|" +
+		"|- - - - - - - -|" +
+		"|x - x - - - x -|" +
+		"|- x - x - x - x|" +
+		"|x - x - x - x -|"
 	board := NewBoard(currentBoardStr)
 
-	legalMoves := board.LegalMoves(RED)
+	start := Location{row: 2, col: 1}
+	intermediate := Location{row: 3, col: 2}
+	dest := Location{row: 4, col: 3}
+
+	assert.False(t, board.canJump(BLACK_PLAYER, start, intermediate, dest))
+
+	start = Location{row: 2, col: 3}
+	intermediate = Location{row: 3, col: 4}
+	dest = Location{row: 4, col: 5}
+
+	assert.True(t, board.canJump(BLACK_PLAYER, start, intermediate, dest))
+
+}
+
+func DISTEstlegalmoves(t *testing.T) {
+
+	// o == black piece
+	// O == black king
+	// x == red piece
+	// X == red king
+	// - == unoccupied square (may be legal dark or illegal white)
+	currentBoardStr := "" +
+		"|- o - o - o - o|" +
+		"|o - o - o - o -|" +
+		"|- o - o - o - o|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|x - x - x - x -|" +
+		"|- x - x - x - x|" +
+		"|x - x - x - x -|"
+	board := NewBoard(currentBoardStr)
+
+	legalMoves := board.LegalMoves(BLACK_PLAYER)
 	assert.Equals(t, len(legalMoves), 7)
-
-	/*
-		possibleRedMove1 := "" +
-			"|- x - x - x - x|" +
-			"|x - x - x - x -|" +
-			"|- - - x - x - x|" +
-			"|x - - - - - - -|" +
-			"|- - - - - - - -|" +
-			"|o - o - o - o -|" +
-			"|- o - o - o - o|" +
-			"|o - o - o - o -|"
-
-		possibleRedMove2 := "" +
-			"|- x - x - x - x|" +
-			"|x - x - x - x -|" +
-			"|- x - x - - - x|" +
-			"|- - - - x - - -|" +
-			"|- - - - - - - -|" +
-			"|o - o - o - o -|" +
-			"|- o - o - o - o|" +
-			"|o - o - o - o -|"
-
-		possibleBoardStates := movegen.LegalMoveBoardStates()
-		assert.Equals(t, len(possibleBoardStates), 8) // 8??
-
-		assert.True(t, movegen.IsPossibleBoardstate(possibleRedMove1))
-		assert.True(t, movegen.IsPossibleBoardstate(possibleRedMove2))
-	*/
 
 }
