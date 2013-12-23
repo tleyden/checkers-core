@@ -30,14 +30,14 @@ func TestNewBoard(t *testing.T) {
 func TestCanJump(t *testing.T) {
 
 	currentBoardStr := "" +
-		"|- o - o - o - o|" +
-		"|o - o - o - o -|" +
-		"|- - - - - o - o|" +
+		"|- o - - - o - o|" +
+		"|o - x - o - o -|" +
+		"|- o - - - o - o|" +
 		"|- - - - X - - -|" +
 		"|- - - - - - - -|" +
 		"|x - o - o - x -|" +
-		"|- x - x - x - x|" +
-		"|x - x - x - x -|"
+		"|- x - x - o - x|" +
+		"|x - x - - - x -|"
 	board := NewBoard(currentBoardStr)
 
 	start := Location{row: 5, col: 0}
@@ -64,6 +64,18 @@ func TestCanJump(t *testing.T) {
 
 	assert.True(t, board.canJump(RED_PLAYER, start, intermediate, dest))
 
+	// red piece trying to jump backwards
+	start = Location{row: 5, col: 6}
+	intermediate = Location{row: 6, col: 5}
+	dest = Location{row: 7, col: 4}
+	assert.False(t, board.canJump(RED_PLAYER, start, intermediate, dest))
+
+	// black piece trying to jump backwards
+	start = Location{row: 2, col: 1}
+	intermediate = Location{row: 1, col: 2}
+	dest = Location{row: 0, col: 3}
+	assert.False(t, board.canJump(BLACK_PLAYER, start, intermediate, dest))
+
 }
 
 func TestCanMove(t *testing.T) {
@@ -71,10 +83,10 @@ func TestCanMove(t *testing.T) {
 	currentBoardStr := "" +
 		"|- o - o - o - o|" +
 		"|o - o - o - o -|" +
-		"|- o - o - O - o|" +
+		"|- - - o - O - o|" +
 		"|- - - - x - - -|" +
 		"|- - - - - - - -|" +
-		"|x - x - - - x -|" +
+		"|x - x - o - x -|" +
 		"|- x - x - x - x|" +
 		"|x - x - x - x -|"
 	board := NewBoard(currentBoardStr)
@@ -85,6 +97,14 @@ func TestCanMove(t *testing.T) {
 
 	start = Location{row: 5, col: 0}
 	dest = Location{row: 2, col: 5}
+	assert.False(t, board.canMove(RED_PLAYER, start, dest))
+
+	start = Location{row: 5, col: 4}
+	dest = Location{row: 4, col: 3}
+	assert.False(t, board.canMove(BLACK_PLAYER, start, dest))
+
+	start = Location{row: 3, col: 4}
+	dest = Location{row: 5, col: 3}
 	assert.False(t, board.canMove(RED_PLAYER, start, dest))
 
 }
@@ -144,6 +164,10 @@ func TestNonJumpMovesForLocation(t *testing.T) {
 	moves = board.nonJumpMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
+	loc = Location{row: 7, col: 7}
+	moves = board.nonJumpMovesForLocation(RED_PLAYER, loc)
+	assert.Equals(t, len(moves), 0)
+
 }
 
 func TestLegalMovesForLocation(t *testing.T) {
@@ -176,7 +200,7 @@ func TestLegalMovesForLocation(t *testing.T) {
 
 }
 
-func DISTEstlegalmoves(t *testing.T) {
+func TestLegalMoves(t *testing.T) {
 
 	// o == black piece
 	// O == black king
@@ -195,6 +219,9 @@ func DISTEstlegalmoves(t *testing.T) {
 	board := NewBoard(currentBoardStr)
 
 	legalMoves := board.LegalMoves(BLACK_PLAYER)
+	assert.Equals(t, len(legalMoves), 7)
+
+	legalMoves = board.LegalMoves(RED_PLAYER)
 	assert.Equals(t, len(legalMoves), 7)
 
 }

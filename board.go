@@ -171,7 +171,6 @@ func (board Board) canMove(player Player, start, dest Location) bool {
 		return true // move is legal
 	}
 
-	return false
 }
 
 func (board Board) canJump(player Player, start, intermediate, dest Location) bool {
@@ -189,6 +188,7 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 		if board.pieceAt(start) == RED && isMovingDown(start, dest) {
 			return false // Regular red piece can only move up
 		}
+		logg.Log("not moving down ..")
 		intermediate := board.pieceAt(intermediate)
 		if intermediate != BLACK && intermediate != BLACK_KING {
 			return false // there is no black piece to jump
