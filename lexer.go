@@ -19,8 +19,15 @@ Lexer used for parsing compact board representations, eg converting:
 		"|- o - o - o - o|"
 		"|o - o - o - o -|"
 
-into a Board struct.
+into a Board struct.  Here are is what the lexer does:
 
+* `\` - pipe delimiter ignored
+* ` ` - whitespace ignored
+* `x` - emit item w/ item.typ: itemSquareRed
+* `X` - emit item w/ item.typ: itemSquareRedKing
+* `o` - emit item w/ item.typ: itemSquareBlack
+* `O` - emit item w/ item.typ: itemSquareBlacKing
+* `-` - emit item w/ item.typ: itemSquareEmpty
 
 */
 
@@ -165,11 +172,6 @@ func lexInsideRow(l *lexer) stateFn {
 	return nil      // Stop the run loop.
 }
 
-// isSpace reports whether r is a space character.
-func isSpace(r rune) bool {
-	return r == ' ' || r == '\t'
-}
-
 // errorf returns an error token and terminates the scan by passing
 // back a nil pointer that will be the next state, terminating l.nextItem.
 func (l *lexer) errorf(format string, args ...interface{}) stateFn {
@@ -186,4 +188,9 @@ func (l *lexer) ignore() {
 // Can be called only once per call of next.
 func (l *lexer) backup() {
 	l.pos -= l.width
+}
+
+// isSpace reports whether r is a space character.
+func isSpace(r rune) bool {
+	return r == ' ' || r == '\t'
 }
