@@ -43,13 +43,9 @@ func TestLegalMoves(t *testing.T) {
 		"|o - o - o - o -|" +
 		"|- o - o - o - o|" +
 		"|o - o - o - o -|"
-	currentBoardState := NewBoard(currentBoardStr)
+	board := NewBoard(currentBoardStr)
 
-	movegen := Movegen{
-		board: currentBoardState
-	}
-
-	legalMoves := movegen.LegalMoves(RED)
+	legalMoves := board.LegalMoves(RED)
 	assert.Equals(t, len(legalMoves), 7)
 
 	/*
