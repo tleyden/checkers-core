@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func DisTestNewBoard(t *testing.T) {
+func TestNewBoard(t *testing.T) {
 
 	boardStr := "" +
 		"|- x - x - x - x|" +
@@ -17,8 +17,11 @@ func DisTestNewBoard(t *testing.T) {
 		"|- o - o - o - o|" +
 		"|o - o - o - o -|"
 	board := NewBoard(boardStr)
-	assert.Equals(t, board[0][0], EMPTY)
-	assert.Equals(t, board[0][1], RED)
+	assert.Equals(t, int(board[0][0]), int(EMPTY)) // TODO: why is cast to int() needed?
+	assert.Equals(t, int(board[0][1]), int(RED))
+	assert.Equals(t, int(board[7][0]), int(BLACK))
+	assert.Equals(t, int(board[7][7]), int(EMPTY))
+
 	// etc...
 
 }
