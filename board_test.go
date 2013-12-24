@@ -189,6 +189,43 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
+		"|- o - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 4, col: 0}
+	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	assert.Equals(t, len(moves), 2)
+
+	jumpMove1 := Move{
+		from: Location{row: 4, col: 0},
+		to:   Location{row: 0, col: 0},
+	}
+
+	jumpMove2 := Move{
+		from: Location{row: 4, col: 0},
+		to:   Location{row: 4, col: 4},
+	}
+	foundJumpMove1 := false
+	foundJumpMove2 := false
+	for _, move := range moves {
+		if move.from == jumpMove1.from && move.to == jumpMove1.to {
+			foundJumpMove1 = true
+		}
+		if move.from == jumpMove2.from && move.to == jumpMove2.to {
+			foundJumpMove2 = true
+		}
+	}
+	assert.True(t, foundJumpMove1)
+	assert.True(t, foundJumpMove2)
+
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
 		"|- o - o - - - -|" +
@@ -197,9 +234,9 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
-	board := NewBoard(currentBoardStr)
-	loc := Location{row: 4, col: 0}
-	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	board = NewBoard(currentBoardStr)
+	loc = Location{row: 4, col: 0}
+	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
 	for i, move := range moves {
 		logg.Log("move %d: %v", i, move)
