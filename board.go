@@ -328,13 +328,16 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 		return
 	} else {
 		for i, jumpMove := range jumpMoves {
+
 			if i == 0 {
 				// first move in the fork, add it to the current boardMoveSeq
 				// and make recursive call
 				boardPostMove := jumpMove.board
-				boardMoveSeq[lastMoveIndex+1] = jumpMove
-				logg.Log("recursive call, i = 0")
-				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeq)
+				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
+				boardMoveSequences[curBoardMoveSeqIndex] = boardMoveSeqCopy
+				logg.Log("recursive call, i = 0.  jumpMove: %v", jumpMove.move)
+				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, curBoardMoveSeqIndex, boardMoveSequences)
 
 			} else {
 				// for all other moves in the fork, we need to copy the
@@ -345,7 +348,7 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
 				newBoardMoveSeqIndex := curBoardMoveSeqIndex + i
 				boardMoveSequences[newBoardMoveSeqIndex] = boardMoveSeqCopy
-				logg.Log("recursive call, i: %d.  newSeqIndex: %d", i, newBoardMoveSeqIndex)
+				logg.Log("recursive call, i: %d.  jumpMove: %v, newSeqIndex: %d", i, jumpMove.move, newBoardMoveSeqIndex)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, newBoardMoveSeqIndex, boardMoveSequences)
 
 			}

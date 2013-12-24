@@ -261,7 +261,7 @@ func DisTestDoubleJumpMovesForLocation(t *testing.T) {
 
 }
 
-func TestRecursiveExplodeJumpMove1(t *testing.T) {
+func DISTestRecursiveExplodeJumpMove1(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -317,7 +317,7 @@ func TestRecursiveExplodeJumpMove2(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- o - o - - - -|" +
 		"|X - - - - - - -|" +
-		"|- - - - - - - -|" +
+		"|- - - - - o - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
