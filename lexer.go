@@ -167,9 +167,6 @@ func lexInsideRow(l *lexer) stateFn {
 		}
 	}
 
-	// Correctly reached EOF.
-	l.emit(itemEOF) // Useful to make EOF a token.
-	return nil      // Stop the run loop.
 }
 
 // errorf returns an error token and terminates the scan by passing
