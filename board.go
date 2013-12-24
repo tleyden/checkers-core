@@ -321,8 +321,10 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 	curLocation := lastBoardMove.move.to
 
 	jumpMoves := board.alternateSingleStepJumpPaths(player, curLocation)
+	logg.Log("num alt jump moves: %d", len(jumpMoves))
 	if len(jumpMoves) == 0 {
 		// we are done!  we hit terminal state
+		logg.Log("we are done, hit terminal state")
 		return
 	} else {
 		for i, jumpMove := range jumpMoves {
@@ -331,6 +333,7 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				// and make recursive call
 				boardPostMove := jumpMove.board
 				boardMoveSeq[lastMoveIndex+1] = jumpMove
+				logg.Log("recursive call, i = 0")
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
 
 			} else {
@@ -340,8 +343,9 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				boardPostMove := jumpMove.board
 				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeq)
 				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
-				newBoardMoveSeqIndex := curBoardMoveSeqIndex + 1
+				newBoardMoveSeqIndex := curBoardMoveSeqIndex + i
 				boardMoveSequences[newBoardMoveSeqIndex] = boardMoveSeqCopy
+				logg.Log("recursive call, i: %d.  newSeqIndex: %d", i, newBoardMoveSeqIndex)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, newBoardMoveSeqIndex, boardMoveSequences)
 
 			}

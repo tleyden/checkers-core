@@ -166,18 +166,18 @@ func TestAlternateSingleStepJumpPaths(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
-		"|- - - o - o - -|" +
+		"|- o - o - - - -|" +
 		"|- - X - - - - -|" +
-		"|- - - o - o - -|" +
+		"|- o - o - - - -|" +
 		"|- - - - - - - -|" +
-		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 2, col: 2}
 	boardMoves := board.alternateSingleStepJumpPaths(RED_PLAYER, loc)
-	assert.Equals(t, len(boardMoves), 2)
+	assert.Equals(t, len(boardMoves), 4)
 
 }
 
@@ -185,7 +185,7 @@ func TestAlternateSingleStepJumpPaths(t *testing.T) {
 To deal with double jumps,
 
 */
-func TestDoubleJumpMovesForLocation(t *testing.T) {
+func DisTestDoubleJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -261,7 +261,7 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 }
 
-func TestRecursiveExplodeJumpMove(t *testing.T) {
+func TestRecursiveExplodeJumpMove1(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -306,6 +306,54 @@ func TestRecursiveExplodeJumpMove(t *testing.T) {
 
 	boardMoveNonExistent := finalBoardMoveSeq[2]
 	assert.False(t, boardMoveNonExistent.move.IsInitialized())
+
+}
+
+func TestRecursiveExplodeJumpMove2(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+
+	from := Location{row: 4, col: 0}
+	over := Location{row: 3, col: 1}
+	to := Location{row: 2, col: 2}
+	startingMove := Move{
+		from: from,
+		over: over,
+		to:   to,
+	}
+
+	boardPostMove := board.applyMove(RED_PLAYER, startingMove)
+	boardMove := BoardMove{
+		board: boardPostMove,
+		move:  startingMove,
+	}
+
+	boardMoveSeq := make([]BoardMove, 1000)
+	boardMoveSeq[0] = boardMove
+
+	boardMoveSequences := make([][]BoardMove, 1000)
+	boardMoveSequences[0] = boardMoveSeq
+
+	curBoardMoveSeqIndex := 0
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+
+	for i, boardMoveSequence := range boardMoveSequences {
+		for j, boardMove := range boardMoveSequence {
+			if boardMove.move.IsInitialized() {
+				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+			}
+		}
+	}
 
 }
 
