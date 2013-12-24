@@ -123,70 +123,145 @@ func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
 // The result will be sorted descending by the longest jump sequence.
 func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]Move {
 	/*
-		// this is the starting board before explode jump move is called
-		currentBoardStr = "" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- o - o - o - -|" +
-			"|X - - - - - - -|" +
-			"|- o - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - - - - - -|"
+				// this is the starting board before explode jump move is called
+				currentBoardStr = "" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|X - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
 
-		// down-path - this is a different single jump path,
-		// we aren't called with this on this invocation to explodeJumpMove.
-		// ignore it, just for context.
-		currentBoardStr = "" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- o - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - x - - - - -|" +
-			"|- - - - - - - -|"
+				// down-path - this is a different single jump path,
+				// we aren't called with this on this invocation to explodeJumpMove.
+				// ignore it, just for context.
+				currentBoardStr = "" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - x - - - - -|" +
+					"|- - - - - - - -|"
 
-		// ----------- start: time step 0 ---------------
+				// ----------- start: time step 0 ---------------
 
-		// up-path - this is the single jump path we are called
-		// with on this invocation to explode jump move.
-		// note there are several paths
-		currentBoardStr = "" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - X - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- o - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - - - - - -|"
+				// up-path - this is the single jump path we are called
+				// with on this invocation to explode jump move.
+				// note there are several paths
+				currentBoardStr = "" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - X - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
 
-		// ----------- time step 1 --------------
+				// ----------- time step 1 --------------
 
-		// up-path-up
-		currentBoardStr = "" +
-			"|- - - - X - - -|" +
-			"|- - - - - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- o - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - - - - - -|"
+				// up-path-up
+				currentBoardStr = "" +
+					"|- - - - X - - -|" +
+					"|- - - - - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
 
-		// up-path-down
-		currentBoardStr = "" +
-			"|- - - - - - - -|" +
-			"|- - - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - - - o - -|" +
-			"|- - - - X - - -|" +
-			"|- o - o - o - -|" +
-			"|- - - - - - - -|" +
-			"|- - - - - - - -|"
+				// up-path-down
+				currentBoardStr = "" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - o - -|" +
+					"|- - - - X - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
 
-		// ----------- /end time step 1 in parellel universes --------------
+				// ----------- /end time step 1  --------------
+
+				// ----------- time step 2 --------------
+
+				// From time step 1: up-path-up
+				currentBoardStr = "" +
+					"|- - - - X - - -|" +
+					"|- - - - - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
+
+		                    // time step 2: up-path-up-down
+				    currentBoardStr = "" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - - X -|" +
+					    "|- - - o - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- o - o - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - - - -|"
+
+
+				// From time step 1: up-path-down
+				currentBoardStr = "" +
+					"|- - - - - - - -|" +
+					"|- - - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - o - -|" +
+					"|- - - - X - - -|" +
+					"|- o - o - o - -|" +
+					"|- - - - - - - -|" +
+					"|- - - - - - - -|"
+
+		                    // time step 2: up-path-down-up
+				    currentBoardStr = "" +
+					    "|- - - - - - - -|" +
+					    "|- - - o - o - -|" +
+					    "|- - - - - - X -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - - - -|" +
+					    "|- o - o - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - - - -|"
+
+		                    // time step 2: up-path-down-downleft (TERMINAL)
+				    currentBoardStr = "" +
+					    "|- - - - - - - -|" +
+					    "|- - - o - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- o - o - - - -|" +
+					    "|- - - - - - X -|" +
+					    "|- - - - - - - -|"
+
+		                    // time step 2: up-path-down-downright
+				    currentBoardStr = "" +
+					    "|- - - - - - - -|" +
+					    "|- - - o - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- - - - - o - -|" +
+					    "|- - - - - - - -|" +
+					    "|- o - - - o - -|" +
+					    "|- - X - - - - -|" +
+					    "|- - - - - - - -|"
+
+
+
+				// ----------- /end time step 2  --------------
+
+
 	*/
 
 	// so at time step 1, the input was a board state and a jump piece / location,
@@ -195,26 +270,99 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 	// non terminal.
 
 	boardPostMove := board.applyMove(player, startingMove)
+	boardMove := BoardMove{
+		board: boardPostMove,
+		move:  startingMove,
+	}
+
+	// to make it easier, for the first pass we'll just pre-alloc the slices
+	// and make them bigger than they'd need to be
+	boardMoveSeq := make([]BoardMove, 1000)
+	boardMoveSeq[0] = boardMove
+
+	boardMoveSequences := make([][]BoardMove, 1000)
+	boardMoveSequences[0] = boardMoveSeq
+
+	curBoardMoveSeqIndex := 0
+	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+
+	moveSequences := convertToMoveSequences(boardMoveSequences)
+	return moveSequences
 
 	// moveSeq := NewMoveSeq(boardPostMove, startingMove)
 
-	jumpMoves := boardPostMove.singleJumpMovesForLocation(player, startingMove.to)
+	/*
+		jumpMoves := boardPostMove.singleJumpMovesForLocation(player, startingMove.to)
+		if len(jumpMoves) == 0 {
+			moveSequence := []Move{}
+			altMoveSequences := [][]Move{moveSequence}
+			return altMoveSequences
+
+		} else {
+
+			altMoveSequences := make([][]Move, len(jumpMoves))
+			for i, jumpMove := range jumpMoves {
+				moveSequence := []Move{startingMove, jumpMove}
+				altMoveSequences[i] = moveSequence
+			}
+
+			return altMoveSequences
+
+		}
+	*/
+
+}
+
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, curBoardMoveSeqIndex int, boardMoveSequences [][]BoardMove) {
+
+	// get the location of the last move in the sequence
+	lastMoveIndex := lastBoardMoveIndex(boardMoveSeq)
+	lastBoardMove := boardMoveSeq[lastMoveIndex]
+	curLocation := lastBoardMove.move.to
+
+	jumpMoves := board.alternateSingleStepJumpPaths(player, curLocation)
 	if len(jumpMoves) == 0 {
-		moveSequence := []Move{}
-		altMoveSequences := [][]Move{moveSequence}
-		return altMoveSequences
-
+		// we are done!  we hit terminal state
+		return
 	} else {
-
-		altMoveSequences := make([][]Move, len(jumpMoves))
 		for i, jumpMove := range jumpMoves {
-			moveSequence := []Move{startingMove, jumpMove}
-			altMoveSequences[i] = moveSequence
+			if i == 0 {
+				// first move in the fork, add it to the current boardMoveSeq
+				// and make recursive call
+				boardPostMove := jumpMove.board
+				boardMoveSeq[lastMoveIndex+1] = jumpMove
+				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+
+			} else {
+				// for all other moves in the fork, we need to copy the
+				// current boardMoveSeq and add it to boardMoveSeqeunces
+				// and make recursive call.  (don't forget to use new index!)
+				boardPostMove := jumpMove.board
+				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeq)
+				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
+				newBoardMoveSeqIndex := curBoardMoveSeqIndex + 1
+				boardMoveSequences[newBoardMoveSeqIndex] = boardMoveSeqCopy
+				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, newBoardMoveSeqIndex, boardMoveSequences)
+
+			}
+
 		}
 
-		return altMoveSequences
-
 	}
+
+}
+
+func lastBoardMoveIndex(boardMoveSeq []BoardMove) int {
+
+	if len(boardMoveSeq) == 0 {
+		return -1
+	}
+	for i, curBoardMove := range boardMoveSeq {
+		if curBoardMove.move.IsInitialized() == false {
+			return i - 1
+		}
+	}
+	return -1
 
 }
 
@@ -532,4 +680,24 @@ func getPlayerKingPiece(player Player) Piece {
 	default: // BLACK_PLAYER
 		return BLACK_KING
 	}
+}
+
+func convertToMoveSequences(boardMoveSequences [][]BoardMove) [][]Move {
+
+	// TODO: unstub
+	moveSequence := []Move{}
+	altMoveSequences := [][]Move{moveSequence}
+	return altMoveSequences
+
+}
+
+func copyBoardMoveSeq(boardMoveSeq []BoardMove) []BoardMove {
+	result := make([]BoardMove, 1000)
+	for i, boardMove := range boardMoveSeq {
+		if boardMove.move.IsInitialized() {
+			result[i] = boardMove
+		}
+	}
+	return result
+
 }

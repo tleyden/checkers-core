@@ -24,3 +24,13 @@ func NewMove(moveSequence []Move) Move {
 func (move Move) IsJump() bool {
 	return (move.from.row-move.to.row == 2 || move.from.row-move.to.row == -2)
 }
+
+func (move Move) IsInitialized() bool {
+	if move.from.row == 0 &&
+		move.from.col == 0 &&
+		move.to.row == 0 &&
+		move.to.col == 0 {
+		return false
+	}
+	return true
+}
