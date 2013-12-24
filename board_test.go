@@ -134,6 +134,10 @@ func TestCanMove(t *testing.T) {
 
 }
 
+/*
+To deal with double jumps,
+
+*/
 func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
