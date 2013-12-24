@@ -327,34 +327,51 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 		logg.Log("we are done, hit terminal state")
 		return
 	} else {
+
+		boardMoveSeqSnapshot := copyBoardMoveSeq(boardMoveSeq)
+
 		for i, jumpMove := range jumpMoves {
+
+			logg.Log("consider jump move %d: %v", i, jumpMove.move)
 
 			if i == 0 {
 				// first move in the fork, add it to the current boardMoveSeq
 				// and make recursive call
 				boardPostMove := jumpMove.board
-				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeq)
-				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
-				boardMoveSequences[curBoardMoveSeqIndex] = boardMoveSeqCopy
+				boardMoveSeq[lastMoveIndex+1] = jumpMove
 				logg.Log("recursive call, i = 0.  jumpMove: %v", jumpMove.move)
-				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, curBoardMoveSeqIndex, boardMoveSequences)
+				dumpBoardMoveSequences(boardMoveSequences)
+				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
 
 			} else {
 				// for all other moves in the fork, we need to copy the
 				// current boardMoveSeq and add it to boardMoveSeqeunces
 				// and make recursive call.  (don't forget to use new index!)
 				boardPostMove := jumpMove.board
-				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeq)
+				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
 				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
 				newBoardMoveSeqIndex := curBoardMoveSeqIndex + i
 				boardMoveSequences[newBoardMoveSeqIndex] = boardMoveSeqCopy
 				logg.Log("recursive call, i: %d.  jumpMove: %v, newSeqIndex: %d", i, jumpMove.move, newBoardMoveSeqIndex)
+				dumpBoardMoveSequences(boardMoveSequences)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, newBoardMoveSeqIndex, boardMoveSequences)
 
 			}
 
 		}
 
+	}
+
+}
+
+func dumpBoardMoveSequences(boardMoveSequences [][]BoardMove) {
+
+	for i, boardMoveSequence := range boardMoveSequences {
+		for j, boardMove := range boardMoveSequence {
+			if boardMove.move.IsInitialized() {
+				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+			}
+		}
 	}
 
 }
