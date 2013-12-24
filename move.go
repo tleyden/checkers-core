@@ -10,3 +10,7 @@ type Move struct {
 	// does not provide any additional information.
 	submoves []Move
 }
+
+func NewMove(moveSequence []Move) Move {
+	return Move{}
+}

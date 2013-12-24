@@ -75,8 +75,19 @@ func (board Board) LegalMoves(player Player) []Move {
 func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	moves := []Move{}
 
-	jumpMoves := board.jumpMovesForLocation(player, loc)
-	moves = append(moves, jumpMoves...)
+	jumpMoves := board.singleJumpMovesForLocation(player, loc)
+	for _, jumpMove := range jumpMoves {
+		if board.canExplodeJumpMove(player, jumpMove) {
+			jumpMoveSequences := board.explodeJumpMove(player, jumpMove)
+			for _, moveSequence := range jumpMoveSequences {
+				nJumpMove := NewMove(moveSequence)
+				moves = append(moves, nJumpMove)
+			}
+		} else {
+			moves = append(moves, jumpMove)
+		}
+
+	}
 
 	// only check for non-jump moves if we don't have any jump moves
 	if len(jumpMoves) == 0 {
@@ -87,7 +98,25 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	return moves
 }
 
-func (board Board) jumpMovesForLocation(player Player, loc Location) []Move {
+func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
+	// TODO
+	return false
+}
+
+// Given a starting jump move, return a slice of move slices, where each slice
+// of moves represents a particular move sequence of consecutive jumps.
+// In each slice of moves, the first move will be startingMove.  In most cases,
+// this will return only a single slice of moves, but its possible for jumps to
+// "branch", eg, jump to a square where multiple jumps are possible.
+// The result will be sorted descending by the longest jump sequence.
+func (board Board) explodeJumpMove(player Player, startingMove Move) [][]Move {
+
+	moveSequences := []Move{}
+	altMoveSequences := [][]Move{moveSequences}
+	return altMoveSequences
+}
+
+func (board Board) singleJumpMovesForLocation(player Player, loc Location) []Move {
 
 	moves := []Move{}
 

@@ -151,7 +151,7 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- - - - - - - -|"
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
-	moves := board.jumpMovesForLocation(RED_PLAYER, loc)
+	moves := board.singleJumpMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
 	for i, move := range moves {
@@ -181,22 +181,22 @@ func TestJumpMovesForLocation(t *testing.T) {
 	board := NewBoard(currentBoardStr)
 
 	loc := Location{row: 3, col: 0}
-	moves := board.jumpMovesForLocation(BLACK_PLAYER, loc)
+	moves := board.singleJumpMovesForLocation(BLACK_PLAYER, loc)
 	assert.Equals(t, len(moves), 0)
 
 	loc = Location{row: 2, col: 3}
-	moves = board.jumpMovesForLocation(BLACK_PLAYER, loc)
+	moves = board.singleJumpMovesForLocation(BLACK_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
 	move := moves[0]
 	assert.Equals(t, move.to.row, 4)
 	assert.Equals(t, move.to.col, 5)
 
 	loc = Location{row: 2, col: 5}
-	moves = board.jumpMovesForLocation(BLACK_PLAYER, loc)
+	moves = board.singleJumpMovesForLocation(BLACK_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
 
 	loc = Location{row: 6, col: 3}
-	moves = board.jumpMovesForLocation(RED_PLAYER, loc)
+	moves = board.singleJumpMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
 }
