@@ -1,7 +1,7 @@
 package checkerscore
 
 import (
-	_ "github.com/couchbaselabs/logg"
+	"github.com/couchbaselabs/logg"
 )
 
 // the possible contents of a square
@@ -23,6 +23,16 @@ const (
 )
 
 type Board [8][8]Piece
+
+func NewBoardFromBoard(otherBoard Board) Board {
+	board := Board{}
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			board[row][col] = otherBoard[row][col]
+		}
+	}
+	return board
+}
 
 func NewBoard(compactBoard string) Board {
 
@@ -78,10 +88,10 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
 	for _, jumpMove := range jumpMoves {
 		if board.canExplodeJumpMove(player, jumpMove) {
-			jumpMoveSequences := board.explodeJumpMove(player, jumpMove)
+			jumpMoveSequences := board.explodeJumpMoveDriver(player, jumpMove)
 			for _, moveSequence := range jumpMoveSequences {
-				nJumpMove := NewMove(moveSequence)
-				moves = append(moves, nJumpMove)
+				multiJumpMove := NewMove(moveSequence)
+				moves = append(moves, multiJumpMove)
 			}
 		} else {
 			moves = append(moves, jumpMove)
@@ -99,8 +109,10 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 }
 
 func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
-	// TODO
-	return false
+	jumpMoveSequences := board.explodeJumpMoveDriver(player, startingMove)
+	canExplode := len(jumpMoveSequences[0]) > 0
+	logg.Log("canExplode: %v", canExplode)
+	return canExplode
 }
 
 // Given a starting jump move, return a slice of move slices, where each slice
@@ -109,11 +121,178 @@ func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
 // this will return only a single slice of moves, but its possible for jumps to
 // "branch", eg, jump to a square where multiple jumps are possible.
 // The result will be sorted descending by the longest jump sequence.
-func (board Board) explodeJumpMove(player Player, startingMove Move) [][]Move {
+func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]Move {
+	/*
+		// this is the starting board before explode jump move is called
+		currentBoardStr = "" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- o - o - o - -|" +
+			"|X - - - - - - -|" +
+			"|- o - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - - - -|"
 
-	moveSequences := []Move{}
-	altMoveSequences := [][]Move{moveSequences}
-	return altMoveSequences
+		// down-path - this is a different single jump path,
+		// we aren't called with this on this invocation to explodeJumpMove.
+		// ignore it, just for context.
+		currentBoardStr = "" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- o - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - x - - - - -|" +
+			"|- - - - - - - -|"
+
+		// ----------- start: time step 0 ---------------
+
+		// up-path - this is the single jump path we are called
+		// with on this invocation to explode jump move.
+		// note there are several paths
+		currentBoardStr = "" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - X - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- o - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - - - -|"
+
+		// ----------- time step 1 --------------
+
+		// up-path-up
+		currentBoardStr = "" +
+			"|- - - - X - - -|" +
+			"|- - - - - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- o - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - - - -|"
+
+		// up-path-down
+		currentBoardStr = "" +
+			"|- - - - - - - -|" +
+			"|- - - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - o - -|" +
+			"|- - - - X - - -|" +
+			"|- o - o - o - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - - - -|"
+
+		// ----------- /end time step 1 in parellel universes --------------
+	*/
+
+	// so at time step 1, the input was a board state and a jump piece / location,
+	// and the output was two different board states (it could have been more),
+	// each that has it's own jump piece / location.  in both cases, the path is
+	// non terminal.
+
+	boardPostMove := board.applyMove(player, startingMove)
+
+	// moveSeq := NewMoveSeq(boardPostMove, startingMove)
+
+	jumpMoves := boardPostMove.singleJumpMovesForLocation(player, startingMove.to)
+	if len(jumpMoves) == 0 {
+		moveSequence := []Move{}
+		altMoveSequences := [][]Move{moveSequence}
+		return altMoveSequences
+
+	} else {
+
+		altMoveSequences := make([][]Move, len(jumpMoves))
+		for i, jumpMove := range jumpMoves {
+			moveSequence := []Move{startingMove, jumpMove}
+			altMoveSequences[i] = moveSequence
+		}
+
+		return altMoveSequences
+
+	}
+
+}
+
+/*
+	// Given this board state, as well as a location that represents
+        // the jumper (row: 2, col: 2 in this case)
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - X - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	// return the following BoardMoves
+
+	// up-path-up
+	currentBoardStr = "" +
+		"|- - - - X - - -|" +
+		"|- - - - - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	// up-path-down
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - o - -|" +
+		"|- - - - X - - -|" +
+		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+
+*/
+
+func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []BoardMove {
+
+	boardMoves := []BoardMove{}
+
+	jumpMoves := board.singleJumpMovesForLocation(player, loc)
+	for _, jumpMove := range jumpMoves {
+		boardPostMove := board.applyMove(player, jumpMove)
+		boardMove := BoardMove{
+			board: boardPostMove,
+			move:  jumpMove,
+		}
+		boardMoves = append(boardMoves, boardMove)
+	}
+	return boardMoves
+
+}
+
+func (board Board) applyMove(player Player, move Move) Board {
+
+	piece := board.pieceAt(move.from)
+	boardPostMove := NewBoardFromBoard(board)
+
+	// delete the piece in the move.from location
+	boardPostMove[move.from.row][move.from.col] = EMPTY
+
+	// put the piece in the move.to location
+	boardPostMove[move.to.row][move.to.col] = piece
+
+	// delete the piece in the middle location (captured)
+	if move.IsJump() {
+		jumpedLocation := move.over
+		boardPostMove[jumpedLocation.row][jumpedLocation.col] = EMPTY
+	}
+
+	return boardPostMove
 }
 
 func (board Board) singleJumpMovesForLocation(player Player, loc Location) []Move {
@@ -129,16 +308,36 @@ func (board Board) singleJumpMovesForLocation(player Player, loc Location) []Mov
 	}
 
 	if board.canJump(player, loc, downLeftOne(loc), downLeftTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: downLeftTwo(loc)})
+		move := Move{
+			from: loc,
+			over: downLeftOne(loc),
+			to:   downLeftTwo(loc),
+		}
+		moves = append(moves, move)
 	}
 	if board.canJump(player, loc, upRightOne(loc), upRightTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: upRightTwo(loc)})
+		move := Move{
+			from: loc,
+			over: upRightOne(loc),
+			to:   upRightTwo(loc),
+		}
+		moves = append(moves, move)
 	}
 	if board.canJump(player, loc, downRightOne(loc), downRightTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: downRightTwo(loc)})
+		move := Move{
+			from: loc,
+			over: downRightOne(loc),
+			to:   downRightTwo(loc),
+		}
+		moves = append(moves, move)
 	}
 	if board.canJump(player, loc, upLeftOne(loc), upLeftTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: upLeftTwo(loc)})
+		move := Move{
+			from: loc,
+			over: upLeftOne(loc),
+			to:   upLeftTwo(loc),
+		}
+		moves = append(moves, move)
 	}
 
 	return moves

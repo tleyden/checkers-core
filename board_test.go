@@ -134,6 +134,34 @@ func TestCanMove(t *testing.T) {
 
 }
 
+func TestApplyMove(t *testing.T) {
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - - - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+	board := NewBoard(currentBoardStr)
+
+	from := Location{row: 4, col: 0}
+	to := Location{row: 2, col: 2}
+	over := Location{row: 3, col: 1}
+
+	move := Move{
+		from: from,
+		to:   to,
+		over: over,
+	}
+	boardPostMove := board.applyMove(RED_PLAYER, move)
+	assert.True(t, boardPostMove.pieceAt(from) == EMPTY)
+	assert.True(t, boardPostMove.pieceAt(over) == EMPTY)
+	assert.True(t, boardPostMove.pieceAt(to) == board.pieceAt(from))
+
+}
+
 /*
 To deal with double jumps,
 
@@ -151,18 +179,27 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- - - - - - - -|"
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
-	moves := board.singleJumpMovesForLocation(RED_PLAYER, loc)
-	assert.Equals(t, len(moves), 2)
+	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 
 	for i, move := range moves {
-		// assert.Equals(t, len(move.submoves), 4)
-		if move.to.row == 2 {
-			logg.Log("move %d went up", i)
-		}
-		if move.to.row == 6 {
-			logg.Log("move %d went down", i)
-		}
+		logg.Log("move %d: %v", i, move)
+	}
 
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - o - -|" +
+		"|X - - - - - - -|" +
+		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+	board = NewBoard(currentBoardStr)
+	loc = Location{row: 4, col: 0}
+	moves = board.legalMovesForLocation(RED_PLAYER, loc)
+
+	for i, move := range moves {
+		logg.Log("move %d: %v", i, move)
 	}
 
 }
