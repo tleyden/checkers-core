@@ -162,6 +162,25 @@ func TestApplyMove(t *testing.T) {
 
 }
 
+func TestAlternateSingleStepJumpPaths(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - X - - - - -|" +
+		"|- - - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - o - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 2, col: 2}
+	boardMoves := board.alternateSingleStepJumpPaths(RED_PLAYER, loc)
+	assert.Equals(t, len(boardMoves), 2)
+
+}
+
 /*
 To deal with double jumps,
 
@@ -177,6 +196,7 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- o - o - - - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
+
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
 	moves := board.legalMovesForLocation(RED_PLAYER, loc)

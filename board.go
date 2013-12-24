@@ -257,7 +257,6 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 
 
 */
-
 func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []BoardMove {
 
 	boardMoves := []BoardMove{}
@@ -433,6 +432,34 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 
 func (board Board) pieceAt(loc Location) Piece {
 	return board[loc.row][loc.col]
+}
+
+/*
+
+Convert to a string that looks like:
+
+		"|- x - x - x - x|" +
+		"|x - x - x - x -|" +
+		"|- x - x - x - x|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|o - o - o - o -|" +
+		"|- o - o - o - o|" +
+		"|o - o - o - o -|"
+
+*/
+func (board Board) CompactString() string {
+
+	// TODO!!
+
+	for row := 0; row < 8; row++ {
+
+		for col := 0; col < 8; col++ {
+
+		}
+	}
+	return "TODO"
+
 }
 
 // one square "down" (row increasing) and to the "left" from the perspective
