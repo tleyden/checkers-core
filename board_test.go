@@ -261,6 +261,54 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 }
 
+func TestRecursiveExplodeJumpMove(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - o - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - - - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+
+	from := Location{row: 4, col: 0}
+	over := Location{row: 3, col: 1}
+	to := Location{row: 2, col: 2}
+	startingMove := Move{
+		from: from,
+		over: over,
+		to:   to,
+	}
+
+	boardPostMove := board.applyMove(RED_PLAYER, startingMove)
+	boardMove := BoardMove{
+		board: boardPostMove,
+		move:  startingMove,
+	}
+
+	boardMoveSeq := make([]BoardMove, 1000)
+	boardMoveSeq[0] = boardMove
+
+	boardMoveSequences := make([][]BoardMove, 1000)
+	boardMoveSequences[0] = boardMoveSeq
+
+	curBoardMoveSeqIndex := 0
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+
+	finalBoardMoveSeq := boardMoveSequences[0]
+	boardMoveAdded := finalBoardMoveSeq[1]
+	assert.Equals(t, boardMoveAdded.move.to.row, 0)
+	assert.Equals(t, boardMoveAdded.move.to.col, 4)
+
+	boardMoveNonExistent := finalBoardMoveSeq[2]
+	assert.False(t, boardMoveNonExistent.move.IsInitialized())
+
+}
+
 func TestJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
