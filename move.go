@@ -10,7 +10,3 @@ type Move struct {
 	// does not provide any additional information.
 	submoves []Move
 }
-
-func (m *Move) AdjustForSubmoves() {
-	// TODO: update from/to based on submoves
-}
