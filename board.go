@@ -87,31 +87,35 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	return moves
 }
 
-func (board Board) jumpMovesForLocation(player Player, loc Location) []Move {
-
-	moves := []Move{}
+func (board Board) appendJumpMovesForLocation(player Player, loc Location, moves *[]Move) {
 
 	playerKingPiece := getPlayerKingPiece(player)
 	playerPiece := getPlayerPiece(player)
 
 	piece := board.pieceAt(loc)
 	if piece != playerPiece && piece != playerKingPiece {
-		return moves
+		return
 	}
 
 	if board.canJump(player, loc, downLeftOne(loc), downLeftTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: downLeftTwo(loc)})
+		*moves = append(*moves, Move{from: loc, to: downLeftTwo(loc)})
 	}
 	if board.canJump(player, loc, upRightOne(loc), upRightTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: upRightTwo(loc)})
+		*moves = append(*moves, Move{from: loc, to: upRightTwo(loc)})
 	}
 	if board.canJump(player, loc, downRightOne(loc), downRightTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: downRightTwo(loc)})
+		*moves = append(*moves, Move{from: loc, to: downRightTwo(loc)})
 	}
 	if board.canJump(player, loc, upLeftOne(loc), upLeftTwo(loc)) {
-		moves = append(moves, Move{from: loc, to: upLeftTwo(loc)})
+		*moves = append(*moves, Move{from: loc, to: upLeftTwo(loc)})
 	}
 
+}
+
+func (board Board) jumpMovesForLocation(player Player, loc Location) []Move {
+
+	moves := []Move{}
+	board.appendJumpMovesForLocation(player, loc, &moves)
 	return moves
 
 }

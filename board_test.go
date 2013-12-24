@@ -2,6 +2,7 @@ package checkerscore
 
 import (
 	"github.com/couchbaselabs/go.assert"
+	"github.com/couchbaselabs/logg"
 	"testing"
 )
 
@@ -130,6 +131,35 @@ func TestCanMove(t *testing.T) {
 	start = Location{row: 3, col: 4}
 	dest = Location{row: 5, col: 3}
 	assert.False(t, board.canMove(RED_PLAYER, start, dest))
+
+}
+
+func TestDoubleJumpMovesForLocation(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|X - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 4, col: 0}
+	moves := board.jumpMovesForLocation(RED_PLAYER, loc)
+	assert.Equals(t, len(moves), 2)
+
+	for i, move := range moves {
+		// assert.Equals(t, len(move.submoves), 4)
+		if move.to.row == 2 {
+			logg.Log("move %d went up", i)
+		}
+		if move.to.row == 6 {
+			logg.Log("move %d went down", i)
+		}
+
+	}
 
 }
 
