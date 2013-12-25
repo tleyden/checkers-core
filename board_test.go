@@ -202,17 +202,14 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
-	jumpMove1 := Move{
-		from: Location{row: 4, col: 0},
-		to:   Location{row: 0, col: 0},
+	for i, move := range moves {
+		logg.Log("0>> move %d: %v", i, move)
 	}
 
-	jumpMove2 := Move{
-		from: Location{row: 4, col: 0},
-		to:   Location{row: 4, col: 4},
+	expected := []string{
+		"{{(4,0)->(4,4)},[{(4,0)->(2,2)},{(2,2)->(4,4)}]}",
+		"{{(4,0)->(0,0)},[{(4,0)->(2,2)},{(2,2)->(0,0)}]}",
 	}
-	expected := []Move{jumpMove1, jumpMove2}
-
 	assertMovesContains(t, moves, expected)
 
 	currentBoardStr = "" +
@@ -230,12 +227,16 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
 	assert.Equals(t, len(moves), 2)
-	jumpMove1 = Move{
-		from: Location{row: 4, col: 0},
-		to:   Location{row: 4, col: 0},
+
+	expected = []string{
+		"{{(4,0)->(4,0)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,2)},{(2,2)->(4,0)}]}",
+		"{{(4,0)->(4,0)},[{(4,0)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,2)},{(6,2)->(4,0)}]}",
 	}
-	expected = []Move{jumpMove1}
 	assertMovesContains(t, moves, expected)
+
+	for i, move := range moves {
+		logg.Log("1>> move %d: %v", i, move)
+	}
 
 	currentBoardStr = "" +
 		"|- - - - - - - -|" +
@@ -250,17 +251,32 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	loc = Location{row: 4, col: 0}
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
+	expected = []string{
+		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(6,6)}]}",
+		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,6)}]}",
+		"{{(4,0)->(4,0)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)},{(2,2)->(4,0)}]}",
+		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,2)},{(2,2)->(0,4)},{(0,4)->(2,6)},{(2,6)->(4,4)},{(4,4)->(6,6)}]}",
+		"{{(4,0)->(4,0)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,2)},{(2,2)->(4,0)}]}",
+		"{{(4,0)->(6,6)},[{(4,0)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,6)}]}",
+		"{{(4,0)->(2,2)},[{(4,0)->(2,2)},{(2,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)}]}",
+		"{{(4,0)->(4,0)},[{(4,0)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,2)},{(6,2)->(4,0)}]}",
+		"{{(4,0)->(6,6)},[{(4,0)->(2,2)},{(2,2)->(0,4)},{(0,4)->(2,6)},{(2,6)->(4,4)},{(4,4)->(6,6)}]}",
+		"{{(4,0)->(4,0)},[{(4,0)->(2,2)},{(2,2)->(0,4)},{(0,4)->(2,6)},{(2,6)->(4,4)},{(4,4)->(6,2)},{(6,2)->(4,0)}]}",
+		"{{(4,0)->(2,2)},[{(4,0)->(2,2)},{(2,2)->(0,4)},{(0,4)->(2,6)},{(2,6)->(4,4)},{(4,4)->(2,2)}]}",
+	}
+	assertMovesContains(t, moves, expected)
+
 	for i, move := range moves {
-		logg.Log(">> move %d: %v", i, move)
+		logg.Log("2>> move %d: %v", i, move)
 	}
 
 }
 
-func assertMovesContains(t *testing.T, actualMoves []Move, expectedMoves []Move) {
+func assertMovesContains(t *testing.T, actualMoves []Move, expectedMoves []string) {
 	for _, expectedMove := range expectedMoves {
 		found := false
 		for _, actualMove := range actualMoves {
-			if actualMove.from == expectedMove.from && actualMove.to == expectedMove.to {
+			if actualMove.compactString() == expectedMove {
 				found = true
 			}
 		}
