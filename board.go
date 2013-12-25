@@ -301,33 +301,43 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 	if len(jumpMoves) == 0 {
 		// we are done!  we hit terminal state
 		return
-	} else {
+	}
 
-		boardMoveSeqSnapshot := copyBoardMoveSeq(boardMoveSeq)
+	boardMoveSeqSnapshot := copyBoardMoveSeq(boardMoveSeq)
 
-		for i, jumpMove := range jumpMoves {
+	for i, jumpMove := range jumpMoves {
 
-			if i == 0 {
-				// first move in the fork, add it to the current boardMoveSeq
-				// and make recursive call
-				boardPostMove := jumpMove.board
-				boardMoveSeq = append(boardMoveSeq, jumpMove)
-				(*boardMoveSequences)[*curBoardMoveSeqIndex] = boardMoveSeq
-				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+		if i == 0 {
+			// first move in the fork, add it to the current boardMoveSeq
+			// and make recursive call
+			boardPostMove := jumpMove.board
+			boardMoveSeq = append(boardMoveSeq, jumpMove)
+			(*boardMoveSequences)[*curBoardMoveSeqIndex] = boardMoveSeq
+			boardPostMove.recursiveExplodeJumpMove(
+				player,
+				boardMoveSeq,
+				curBoardMoveSeqIndex,
+				boardMoveSequences,
+			)
 
-			} else {
-				// for all other moves in the fork, we need to copy the
-				// current boardMoveSeq and add it to boardMoveSeqeunces
-				// and make recursive call.  (don't forget to use new index!)
-				boardPostMove := jumpMove.board
-				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
-				boardMoveSeqCopy = append(boardMoveSeqCopy, jumpMove)
-				*curBoardMoveSeqIndex += 1
-				// boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeqCopy
-				*boardMoveSequences = append(*boardMoveSequences, boardMoveSeqCopy)
-				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, curBoardMoveSeqIndex, boardMoveSequences)
-
-			}
+		} else {
+			// for all other moves in the fork, we need to copy the
+			// current boardMoveSeq and add it to boardMoveSeqeunces
+			// and make recursive call.  (don't forget to use new index!)
+			boardPostMove := jumpMove.board
+			boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
+			boardMoveSeqCopy = append(boardMoveSeqCopy, jumpMove)
+			*curBoardMoveSeqIndex += 1
+			*boardMoveSequences = append(
+				*boardMoveSequences,
+				boardMoveSeqCopy,
+			)
+			boardPostMove.recursiveExplodeJumpMove(
+				player,
+				boardMoveSeqCopy,
+				curBoardMoveSeqIndex,
+				boardMoveSequences,
+			)
 
 		}
 
