@@ -211,19 +211,9 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		from: Location{row: 4, col: 0},
 		to:   Location{row: 4, col: 4},
 	}
-	foundJumpMove1 := false
-	foundJumpMove2 := false
-	for i, move := range moves {
-		logg.Log("test move %d: %v", i, move)
-		if move.from == jumpMove1.from && move.to == jumpMove1.to {
-			foundJumpMove1 = true
-		}
-		if move.from == jumpMove2.from && move.to == jumpMove2.to {
-			foundJumpMove2 = true
-		}
-	}
-	assert.True(t, foundJumpMove1)
-	assert.True(t, foundJumpMove2)
+	expected := []Move{jumpMove1, jumpMove2}
+
+	assertMovesContains(t, moves, expected)
 
 	currentBoardStr = "" +
 		"|- - - - - - - -|" +
@@ -239,9 +229,13 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	loc = Location{row: 4, col: 0}
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
-	for i, move := range moves {
-		logg.Log("move %d: %v", i, move)
+	assert.Equals(t, len(moves), 2)
+	jumpMove1 = Move{
+		from: Location{row: 4, col: 0},
+		to:   Location{row: 4, col: 0},
 	}
+	expected = []Move{jumpMove1}
+	assertMovesContains(t, moves, expected)
 
 	currentBoardStr = "" +
 		"|- - - - - - - -|" +
@@ -257,9 +251,22 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
 	for i, move := range moves {
-		logg.Log("move %d: %v", i, move)
+		logg.Log(">> move %d: %v", i, move)
 	}
 
+}
+
+func assertMovesContains(t *testing.T, actualMoves []Move, expectedMoves []Move) {
+	for _, expectedMove := range expectedMoves {
+		found := false
+		for _, actualMove := range actualMoves {
+			if actualMove.from == expectedMove.from && actualMove.to == expectedMove.to {
+				found = true
+			}
+		}
+		assert.True(t, found)
+
+	}
 }
 
 func DISTestRecursiveExplodeJumpMove1(t *testing.T) {

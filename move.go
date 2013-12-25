@@ -1,5 +1,10 @@
 package checkerscore
 
+import (
+	"bytes"
+	"fmt"
+)
+
 type Move struct {
 	from Location
 	to   Location
@@ -51,4 +56,48 @@ func (move Move) IsInitialized() bool {
 		return false
 	}
 	return true
+}
+
+/*
+Serialize a move into a compact string representation:
+
+    {(0,0)->(2,2)}
+
+or in the case of multiple jumps:
+
+    {{(4,0)->(0,0)},[{(4,0)->(2,2)},{(2,2)->(0,0)}]}
+
+*/
+func (move Move) compactString() string {
+
+	buffer := bytes.Buffer{}
+
+	if len(move.submoves) > 0 {
+		buffer.WriteString("{")
+		buffer.WriteString(move.compactStringWithoutSubmoves())
+		buffer.WriteString(",[")
+		for i, submove := range move.submoves {
+			buffer.WriteString(submove.compactStringWithoutSubmoves())
+			if i != (len(move.submoves) - 1) {
+				buffer.WriteString(",")
+			}
+		}
+		buffer.WriteString("]}")
+
+	} else {
+		buffer.WriteString(move.compactStringWithoutSubmoves())
+	}
+
+	return buffer.String()
+}
+
+func (move Move) compactStringWithoutSubmoves() string {
+	from := fmt.Sprintf("(%d,%d)", move.from.row, move.from.col)
+	to := fmt.Sprintf("(%d,%d)", move.to.row, move.to.col)
+	from_to := fmt.Sprintf("{%v->%v}", from, to)
+	return from_to
+}
+
+func (move Move) String() string {
+	return move.compactString()
 }
