@@ -317,7 +317,7 @@ func TestRecursiveExplodeJumpMove2(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- o - o - o - -|" +
 		"|X - - - - - - -|" +
-		"|- - - - - o - -|" +
+		"|- o - o - o - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
