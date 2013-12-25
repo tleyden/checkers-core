@@ -284,7 +284,7 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 	boardMoveSequences[0] = boardMoveSeq
 
 	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, &curBoardMoveSeqIndex, boardMoveSequences)
 
 	moveSequences := convertToMoveSequences(boardMoveSequences)
 	return moveSequences
@@ -313,7 +313,7 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 
 }
 
-func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, curBoardMoveSeqIndex int, boardMoveSequences [][]BoardMove) {
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, curBoardMoveSeqIndex *int, boardMoveSequences [][]BoardMove) {
 
 	// get the location of the last move in the sequence
 	lastMoveIndex := lastBoardMoveIndex(boardMoveSeq)
@@ -340,7 +340,7 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				boardPostMove := jumpMove.board
 				boardMoveSeq[lastMoveIndex+1] = jumpMove
 				logg.Log("recursive call, i = 0.  jumpMove: %v", jumpMove.move)
-				dumpBoardMoveSequences(boardMoveSequences)
+				// dumpBoardMoveSequences(boardMoveSequences)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
 
 			} else {
@@ -350,11 +350,11 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				boardPostMove := jumpMove.board
 				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
 				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
-				newBoardMoveSeqIndex := curBoardMoveSeqIndex + i
-				boardMoveSequences[newBoardMoveSeqIndex] = boardMoveSeqCopy
-				logg.Log("recursive call, i: %d.  jumpMove: %v, newSeqIndex: %d", i, jumpMove.move, newBoardMoveSeqIndex)
-				dumpBoardMoveSequences(boardMoveSequences)
-				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, newBoardMoveSeqIndex, boardMoveSequences)
+				*curBoardMoveSeqIndex += 1
+				boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeqCopy
+				logg.Log("recursive call, i: %d.  jumpMove: %v, newSeqIndex: %d", i, jumpMove.move, *curBoardMoveSeqIndex)
+				// dumpBoardMoveSequences(boardMoveSequences)
+				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, curBoardMoveSeqIndex, boardMoveSequences)
 
 			}
 

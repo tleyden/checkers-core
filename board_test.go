@@ -297,7 +297,7 @@ func DISTestRecursiveExplodeJumpMove1(t *testing.T) {
 	boardMoveSequences[0] = boardMoveSeq
 
 	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &curBoardMoveSeqIndex, boardMoveSequences)
 
 	finalBoardMoveSeq := boardMoveSequences[0]
 	boardMoveAdded := finalBoardMoveSeq[1]
@@ -345,7 +345,7 @@ func TestRecursiveExplodeJumpMove2(t *testing.T) {
 	boardMoveSequences[0] = boardMoveSeq
 
 	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &curBoardMoveSeqIndex, boardMoveSequences)
 
 	for i, boardMoveSequence := range boardMoveSequences {
 		for j, boardMove := range boardMoveSequence {
