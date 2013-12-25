@@ -279,18 +279,18 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 	boardMoveSeq := []BoardMove{}
 	boardMoveSeq = append(boardMoveSeq, boardMove)
 
-	boardMoveSequences := make([][]BoardMove, 1000)
-	boardMoveSequences[0] = boardMoveSeq
+	boardMoveSequences := [][]BoardMove{}
+	boardMoveSequences = append(boardMoveSequences, boardMoveSeq)
 
 	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, &curBoardMoveSeqIndex, boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, &curBoardMoveSeqIndex, &boardMoveSequences)
 
 	moveSequences := convertToMoveSequences(boardMoveSequences)
 	return moveSequences
 
 }
 
-func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, curBoardMoveSeqIndex *int, boardMoveSequences [][]BoardMove) {
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, curBoardMoveSeqIndex *int, boardMoveSequences *[][]BoardMove) {
 
 	// get the location of the last move in the sequence
 	lastMoveIndex := lastBoardMoveIndex(boardMoveSeq)
@@ -312,8 +312,7 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				// and make recursive call
 				boardPostMove := jumpMove.board
 				boardMoveSeq = append(boardMoveSeq, jumpMove)
-				boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeq
-				// dumpBoardMoveSequences(boardMoveSequences)
+				(*boardMoveSequences)[*curBoardMoveSeqIndex] = boardMoveSeq
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
 
 			} else {
@@ -324,8 +323,8 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
 				boardMoveSeqCopy = append(boardMoveSeqCopy, jumpMove)
 				*curBoardMoveSeqIndex += 1
-				boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeqCopy
-				// dumpBoardMoveSequences(boardMoveSequences)
+				// boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeqCopy
+				*boardMoveSequences = append(*boardMoveSequences, boardMoveSeqCopy)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeqCopy, curBoardMoveSeqIndex, boardMoveSequences)
 
 			}
