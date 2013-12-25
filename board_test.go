@@ -181,10 +181,6 @@ func TestAlternateSingleStepJumpPaths(t *testing.T) {
 
 }
 
-/*
-To deal with double jumps,
-
-*/
 func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
@@ -251,6 +247,10 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	loc = Location{row: 4, col: 0}
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
 
+	for i, move := range moves {
+		logg.Log("2>> move %d: %v", i, move)
+	}
+
 	expected = []string{
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(6,6)}]}",
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,6)}]}",
@@ -265,10 +265,6 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"{{(4,0)->(2,2)},[{(4,0)->(2,2)},{(2,2)->(0,4)},{(0,4)->(2,6)},{(2,6)->(4,4)},{(4,4)->(2,2)}]}",
 	}
 	assertMovesContains(t, moves, expected)
-
-	for i, move := range moves {
-		logg.Log("2>> move %d: %v", i, move)
-	}
 
 }
 

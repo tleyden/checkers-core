@@ -276,8 +276,8 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 
 	// to make it easier, for the first pass we'll just pre-alloc the slices
 	// and make them bigger than they'd need to be
-	boardMoveSeq := make([]BoardMove, 1000)
-	boardMoveSeq[0] = boardMove
+	boardMoveSeq := []BoardMove{}
+	boardMoveSeq = append(boardMoveSeq, boardMove)
 
 	boardMoveSequences := make([][]BoardMove, 1000)
 	boardMoveSequences[0] = boardMoveSeq
@@ -287,28 +287,6 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 
 	moveSequences := convertToMoveSequences(boardMoveSequences)
 	return moveSequences
-
-	// moveSeq := NewMoveSeq(boardPostMove, startingMove)
-
-	/*
-		jumpMoves := boardPostMove.singleJumpMovesForLocation(player, startingMove.to)
-		if len(jumpMoves) == 0 {
-			moveSequence := []Move{}
-			altMoveSequences := [][]Move{moveSequence}
-			return altMoveSequences
-
-		} else {
-
-			altMoveSequences := make([][]Move, len(jumpMoves))
-			for i, jumpMove := range jumpMoves {
-				moveSequence := []Move{startingMove, jumpMove}
-				altMoveSequences[i] = moveSequence
-			}
-
-			return altMoveSequences
-
-		}
-	*/
 
 }
 
@@ -333,7 +311,8 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				// first move in the fork, add it to the current boardMoveSeq
 				// and make recursive call
 				boardPostMove := jumpMove.board
-				boardMoveSeq[lastMoveIndex+1] = jumpMove
+				boardMoveSeq = append(boardMoveSeq, jumpMove)
+				boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeq
 				// dumpBoardMoveSequences(boardMoveSequences)
 				boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, curBoardMoveSeqIndex, boardMoveSequences)
 
@@ -343,7 +322,7 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 				// and make recursive call.  (don't forget to use new index!)
 				boardPostMove := jumpMove.board
 				boardMoveSeqCopy := copyBoardMoveSeq(boardMoveSeqSnapshot)
-				boardMoveSeqCopy[lastMoveIndex+1] = jumpMove
+				boardMoveSeqCopy = append(boardMoveSeqCopy, jumpMove)
 				*curBoardMoveSeqIndex += 1
 				boardMoveSequences[*curBoardMoveSeqIndex] = boardMoveSeqCopy
 				// dumpBoardMoveSequences(boardMoveSequences)
@@ -382,17 +361,18 @@ func dumpMoveSequences(moveSequences [][]Move) {
 }
 
 func lastBoardMoveIndex(boardMoveSeq []BoardMove) int {
-
-	if len(boardMoveSeq) == 0 {
-		return -1
-	}
-	for i, curBoardMove := range boardMoveSeq {
-		if curBoardMove.move.IsInitialized() == false {
-			return i - 1
+	/*
+		if len(boardMoveSeq) == 0 {
+			return -1
 		}
-	}
-	return -1
-
+		for i, curBoardMove := range boardMoveSeq {
+			if curBoardMove.move.IsInitialized() == false {
+				return i - 1
+			}
+		}
+		return -1
+	*/
+	return len(boardMoveSeq) - 1
 }
 
 /*
@@ -730,7 +710,7 @@ func convertToMoveSequences(boardMoveSequences [][]BoardMove) [][]Move {
 }
 
 func copyBoardMoveSeq(boardMoveSeq []BoardMove) []BoardMove {
-	result := make([]BoardMove, 1000)
+	result := make([]BoardMove, len(boardMoveSeq))
 	for i, boardMove := range boardMoveSeq {
 		if boardMove.move.IsInitialized() {
 			result[i] = boardMove
