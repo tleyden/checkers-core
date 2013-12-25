@@ -110,6 +110,9 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 
 func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
 	jumpMoveSequences := board.explodeJumpMoveDriver(player, startingMove)
+	logg.Log("canExplode dump move sequences")
+	dumpMoveSequences(jumpMoveSequences)
+	logg.Log("/canExplode dump move sequences")
 	canExplode := len(jumpMoveSequences[0]) > 0
 	logg.Log("canExplode: %v", canExplode)
 	return canExplode
@@ -370,6 +373,18 @@ func dumpBoardMoveSequences(boardMoveSequences [][]BoardMove) {
 		for j, boardMove := range boardMoveSequence {
 			if boardMove.move.IsInitialized() {
 				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+			}
+		}
+	}
+
+}
+
+func dumpMoveSequences(moveSequences [][]Move) {
+
+	for i, moveSequence := range moveSequences {
+		for j, move := range moveSequence {
+			if move.IsInitialized() {
+				logg.Log("i: %d, j: %d move: %v", i, j, move)
 			}
 		}
 	}
@@ -708,10 +723,20 @@ func getPlayerKingPiece(player Player) Piece {
 
 func convertToMoveSequences(boardMoveSequences [][]BoardMove) [][]Move {
 
-	// TODO: unstub
-	moveSequence := []Move{}
-	altMoveSequences := [][]Move{moveSequence}
-	return altMoveSequences
+	moveSequences := [][]Move{}
+	for i, boardMoveSequence := range boardMoveSequences {
+		moveSequence := []Move{}
+		for j, boardMove := range boardMoveSequence {
+			if boardMove.move.IsInitialized() {
+				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+				moveSequence = append(moveSequence, boardMove.move)
+			}
+		}
+		if len(moveSequence) > 0 {
+			moveSequences = append(moveSequences, moveSequence)
+		}
+	}
+	return moveSequences
 
 }
 

@@ -18,7 +18,25 @@ type BoardMove struct {
 }
 
 func NewMove(moveSequence []Move) Move {
-	return Move{}
+
+	if len(moveSequence) == 0 {
+		panic("move sequence is empty")
+	}
+
+	resultMove := Move{}
+	resultMove.submoves = []Move{}
+
+	// use the first move in the sequence for the "from" location
+	firstMove := moveSequence[0]
+	resultMove.from = firstMove.from
+
+	for _, move := range moveSequence {
+		resultMove.to = move.to
+		resultMove.submoves = append(resultMove.submoves, move)
+	}
+
+	return resultMove
+
 }
 
 func (move Move) IsJump() bool {

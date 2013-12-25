@@ -185,7 +185,7 @@ func TestAlternateSingleStepJumpPaths(t *testing.T) {
 To deal with double jumps,
 
 */
-func DisTestDoubleJumpMovesForLocation(t *testing.T) {
+func TestDoubleJumpMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -213,7 +213,8 @@ func DisTestDoubleJumpMovesForLocation(t *testing.T) {
 	}
 	foundJumpMove1 := false
 	foundJumpMove2 := false
-	for _, move := range moves {
+	for i, move := range moves {
+		logg.Log("test move %d: %v", i, move)
 		if move.from == jumpMove1.from && move.to == jumpMove1.to {
 			foundJumpMove1 = true
 		}
