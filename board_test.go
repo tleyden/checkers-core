@@ -198,10 +198,6 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
-	for i, move := range moves {
-		logg.Log("0>> move %d: %v", i, move)
-	}
-
 	expected := []string{
 		"{{(4,0)->(4,4)},[{(4,0)->(2,2)},{(2,2)->(4,4)}]}",
 		"{{(4,0)->(0,0)},[{(4,0)->(2,2)},{(2,2)->(0,0)}]}",
@@ -230,10 +226,6 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	}
 	assertMovesContains(t, moves, expected)
 
-	for i, move := range moves {
-		logg.Log("1>> move %d: %v", i, move)
-	}
-
 	currentBoardStr = "" +
 		"|- - - - - - - -|" +
 		"|- - - o - o - -|" +
@@ -246,10 +238,6 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	board = NewBoard(currentBoardStr)
 	loc = Location{row: 4, col: 0}
 	moves = board.legalMovesForLocation(RED_PLAYER, loc)
-
-	for i, move := range moves {
-		logg.Log("2>> move %d: %v", i, move)
-	}
 
 	expected = []string{
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(6,6)}]}",
@@ -316,8 +304,7 @@ func DISTestRecursiveExplodeJumpMove1(t *testing.T) {
 	boardMoveSequences := make([][]BoardMove, 1000)
 	boardMoveSequences[0] = boardMoveSeq
 
-	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &curBoardMoveSeqIndex, &boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &boardMoveSequences)
 
 	finalBoardMoveSeq := boardMoveSequences[0]
 	boardMoveAdded := finalBoardMoveSeq[1]
@@ -364,9 +351,7 @@ func TestRecursiveExplodeJumpMove2(t *testing.T) {
 	boardMoveSequences := make([][]BoardMove, 1)
 	boardMoveSequences[0] = boardMoveSeq
 
-	curBoardMoveSeqIndex := 0
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &curBoardMoveSeqIndex, &boardMoveSequences)
-
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &boardMoveSequences)
 	for i, boardMoveSequence := range boardMoveSequences {
 		for j, boardMove := range boardMoveSequence {
 			if boardMove.move.IsInitialized() {
