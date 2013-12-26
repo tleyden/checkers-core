@@ -45,6 +45,9 @@ func NewMove(moveSequence []Move) Move {
 }
 
 func (move Move) IsJump() bool {
+	if len(move.submoves) > 0 {
+		return true
+	}
 	return (move.from.row-move.to.row == 2 || move.from.row-move.to.row == -2)
 }
 

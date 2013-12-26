@@ -162,6 +162,41 @@ func TestApplyMove(t *testing.T) {
 
 }
 
+func TestApplyMoveWithSubmoves(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 4, col: 0}
+	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	assert.Equals(t, len(moves), 1)
+
+	move := moves[0]
+
+	boardPostMove := board.applyMove(RED_PLAYER, move)
+
+	expectedBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - X - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	assert.Equals(t, expectedBoardStr, boardPostMove.CompactString())
+
+}
+
 func TestAlternateSingleStepJumpPaths(t *testing.T) {
 
 	currentBoardStr := "" +

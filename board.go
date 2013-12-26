@@ -1,6 +1,7 @@
 package checkerscore
 
 import (
+	"bytes"
 	"github.com/couchbaselabs/logg"
 )
 
@@ -267,10 +268,17 @@ func (board Board) applyMove(player Player, move Move) Board {
 
 	// delete the piece in the middle location (captured)
 	if move.IsJump() {
-		jumpedLocation := move.over
-		boardPostMove[jumpedLocation.row][jumpedLocation.col] = EMPTY
-	}
+		if len(move.submoves) == 0 {
+			jumpedLocation := move.over
+			boardPostMove[jumpedLocation.row][jumpedLocation.col] = EMPTY
+		} else {
+			for _, submove := range move.submoves {
+				jumpedLocation := submove.over
+				boardPostMove[jumpedLocation.row][jumpedLocation.col] = EMPTY
+			}
+		}
 
+	}
 	return boardPostMove
 }
 
@@ -418,27 +426,43 @@ func (board Board) pieceAt(loc Location) Piece {
 
 Convert to a string that looks like:
 
-		"|- x - x - x - x|" +
-		"|x - x - x - x -|" +
-		"|- x - x - x - x|" +
-		"|- - - - - - - -|" +
-		"|- - - - - - - -|" +
-		"|o - o - o - o -|" +
 		"|- o - o - o - o|" +
-		"|o - o - o - o -|"
+		"|o - o - o - o -|" +
+		"|- - - o - O - o|" +
+		"|- - - - x - - -|" +
+		"|- - - - - - - -|" +
+		"|x - x - o - x -|" +
+		"|- x - x - x - x|" +
+		"|x - x - x - x -|"
 
 */
 func (board Board) CompactString() string {
 
-	// TODO!!
-
+	buffer := bytes.Buffer{}
 	for row := 0; row < 8; row++ {
-
+		buffer.WriteString("|")
 		for col := 0; col < 8; col++ {
-
+			loc := Location{row: row, col: col}
+			piece := board.pieceAt(loc)
+			switch {
+			case piece == EMPTY:
+				buffer.WriteString("-")
+			case piece == BLACK:
+				buffer.WriteString("o")
+			case piece == BLACK_KING:
+				buffer.WriteString("O")
+			case piece == RED:
+				buffer.WriteString("x")
+			case piece == RED_KING:
+				buffer.WriteString("X")
+			}
+			if col < 7 {
+				buffer.WriteString(" ")
+			}
 		}
+		buffer.WriteString("|")
 	}
-	return "TODO"
+	return buffer.String()
 
 }
 

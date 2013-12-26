@@ -2,7 +2,7 @@ package checkerscore
 
 import (
 	"github.com/couchbaselabs/go.assert"
-	"github.com/couchbaselabs/logg"
+	_ "github.com/couchbaselabs/logg"
 	"testing"
 )
 
@@ -42,7 +42,6 @@ func TestLexer(t *testing.T) {
 	assert.Equals(t, item.val, "x")
 
 	item = <-tokensChannel
-	logg.Log("item type: %v item value: %v", item.typ, item.val)
 	assert.Equals(t, item.typ, itemEOF)
 
 }
