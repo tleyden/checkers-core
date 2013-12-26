@@ -88,7 +88,7 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
 	for _, jumpMove := range jumpMoves {
 
-		jumpMoveSequences := board.explodeJumpMoveDriver(player, jumpMove)
+		jumpMoveSequences := board.explodeJumpMove(player, jumpMove)
 		if len(jumpMoveSequences[0]) > 0 {
 			for _, moveSequence := range jumpMoveSequences {
 				multiJumpMove := NewMove(moveSequence)
@@ -116,153 +116,7 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 // this will return only a single slice of moves, but its possible for jumps to
 // "branch", eg, jump to a square where multiple jumps are possible.
 // The result will be sorted descending by the longest jump sequence.
-func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]Move {
-	/*
-				// this is the starting board before explode jump move is called
-				currentBoardStr = "" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|X - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-				// down-path - this is a different single jump path,
-				// we aren't called with this on this invocation to explodeJumpMove.
-				// ignore it, just for context.
-				currentBoardStr = "" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - x - - - - -|" +
-					"|- - - - - - - -|"
-
-				// ----------- start: time step 0 ---------------
-
-				// up-path - this is the single jump path we are called
-				// with on this invocation to explode jump move.
-				// note there are several paths
-				currentBoardStr = "" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - X - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-				// ----------- time step 1 --------------
-
-				// up-path-up
-				currentBoardStr = "" +
-					"|- - - - X - - -|" +
-					"|- - - - - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-				// up-path-down
-				currentBoardStr = "" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - o - -|" +
-					"|- - - - X - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-				// ----------- /end time step 1  --------------
-
-				// ----------- time step 2 --------------
-
-				// From time step 1: up-path-up
-				currentBoardStr = "" +
-					"|- - - - X - - -|" +
-					"|- - - - - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-		                    // time step 2: up-path-up-down
-				    currentBoardStr = "" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - - X -|" +
-					    "|- - - o - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- o - o - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - - - -|"
-
-
-				// From time step 1: up-path-down
-				currentBoardStr = "" +
-					"|- - - - - - - -|" +
-					"|- - - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - o - -|" +
-					"|- - - - X - - -|" +
-					"|- o - o - o - -|" +
-					"|- - - - - - - -|" +
-					"|- - - - - - - -|"
-
-		                    // time step 2: up-path-down-up
-				    currentBoardStr = "" +
-					    "|- - - - - - - -|" +
-					    "|- - - o - o - -|" +
-					    "|- - - - - - X -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - - - -|" +
-					    "|- o - o - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - - - -|"
-
-		                    // time step 2: up-path-down-downleft (TERMINAL)
-				    currentBoardStr = "" +
-					    "|- - - - - - - -|" +
-					    "|- - - o - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- o - o - - - -|" +
-					    "|- - - - - - X -|" +
-					    "|- - - - - - - -|"
-
-		                    // time step 2: up-path-down-downright
-				    currentBoardStr = "" +
-					    "|- - - - - - - -|" +
-					    "|- - - o - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- - - - - o - -|" +
-					    "|- - - - - - - -|" +
-					    "|- o - - - o - -|" +
-					    "|- - X - - - - -|" +
-					    "|- - - - - - - -|"
-
-
-
-				// ----------- /end time step 2  --------------
-
-
-	*/
-
-	// so at time step 1, the input was a board state and a jump piece / location,
-	// and the output was two different board states (it could have been more),
-	// each that has it's own jump piece / location.  in both cases, the path is
-	// non terminal.
+func (board Board) explodeJumpMove(player Player, startingMove Move) [][]Move {
 
 	boardPostMove := board.applyMove(player, startingMove)
 	boardMove := BoardMove{
@@ -270,78 +124,51 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 		move:  startingMove,
 	}
 
-	// to make it easier, for the first pass we'll just pre-alloc the slices
-	// and make them bigger than they'd need to be
-	boardMoveSeq := []BoardMove{}
-	boardMoveSeq = append(boardMoveSeq, boardMove)
+	boardMoveSeq := append([]BoardMove{}, boardMove)
 
-	result := boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq)
+	boardMoveSequences := boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq)
 
-	logg.Log("new result: %d", len(result))
+	// convert from [][]BoardMove -> [][]Move
+	moveSequences := convertToMoveSequences(boardMoveSequences)
 
-	logg.Log("new result")
-	dumpBoardMoveSequences(result)
-	logg.Log("/ new result")
-
-	moveSequences := convertToMoveSequences(result)
 	return moveSequences
 
 }
 
-func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeqParam []BoardMove) [][]BoardMove {
-
-	discoveredBoardMoveSeqs := [][]BoardMove{}
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove) [][]BoardMove {
 
 	// find out where we currently are in the jump sequence
-	lastBoardMove := boardMoveSeqParam[len(boardMoveSeqParam)-1]
+	lastBoardMove := boardMoveSeq[len(boardMoveSeq)-1]
 	curLocation := lastBoardMove.move.to
 
 	jumpMoves := board.alternateSingleStepJumpPaths(player, curLocation)
 	if len(jumpMoves) == 0 {
 		// we are done!  we hit terminal state
-		discoveredBoardMoveSeqs = append(discoveredBoardMoveSeqs, boardMoveSeqParam)
-		logg.Log("return from recursive, dump")
-		dumpBoardMoveSequences(discoveredBoardMoveSeqs)
-		logg.Log("/ return from recursive, dump")
-
-		return discoveredBoardMoveSeqs
+		return append([][]BoardMove{}, boardMoveSeq)
 	}
 
-	boardMoveSeqParamSnapshot := copyBoardMoveSeq(boardMoveSeqParam)
+	// take a snapshot of the current boardMoveSeq
+	boardMoveSeqSnapshot := copyBoardMoveSeq(boardMoveSeq)
 
-	for i, jumpMove := range jumpMoves {
+	upstreamBoardMoveSeqs := [][]BoardMove{}
+
+	for _, jumpMove := range jumpMoves {
 
 		// get the board after having the jump move applied to it
 		boardPostMove := jumpMove.board
 
-		if i == 0 {
-			// first move in the fork, add it to the current boardMoveSeq
-			// and make recursive call
-
-			boardMoveSeqParam = append(boardMoveSeqParamSnapshot, jumpMove)
-
-		} else {
-			// for all other moves in the fork, we need to copy the
-			// current boardMoveSeq and add it to boardMoveSeqeunces
-			// and make recursive call.
-
-			boardMoveSeqParam = append(boardMoveSeqParamSnapshot, jumpMove)
-
-		}
+		// fork boardMoveSeq from the initial snapshot and add this jumpMove
+		boardMoveSeq = append(boardMoveSeqSnapshot, jumpMove)
 
 		upstream := boardPostMove.recursiveExplodeJumpMove(
 			player,
-			boardMoveSeqParam,
+			boardMoveSeq,
 		)
-		discoveredBoardMoveSeqs = append(discoveredBoardMoveSeqs, upstream...)
-
-		logg.Log("upstream")
-		dumpBoardMoveSequences(upstream)
-		logg.Log("/ upstream")
+		upstreamBoardMoveSeqs = append(upstreamBoardMoveSeqs, upstream...)
 
 	}
 
-	return discoveredBoardMoveSeqs
+	return upstreamBoardMoveSeqs
 
 }
 
