@@ -278,14 +278,27 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 	boardMoveSequences := [][]BoardMove{}
 	boardMoveSequences = append(boardMoveSequences, boardMoveSeq)
 
-	boardPostMove.recursiveExplodeJumpMove(player, &boardMoveSequences)
+	result := boardPostMove.recursiveExplodeJumpMove(player, &boardMoveSequences, boardMoveSeq)
 
-	moveSequences := convertToMoveSequences(boardMoveSequences)
+	logg.Log("old (working): %d", len(boardMoveSequences))
+	logg.Log("new result: %d", len(result))
+
+	logg.Log("old (working) result")
+	dumpBoardMoveSequences(boardMoveSequences)
+	logg.Log("/ old (working) result")
+
+	logg.Log("new result")
+	dumpBoardMoveSequences(result)
+	logg.Log("/ new result")
+
+	moveSequences := convertToMoveSequences(result)
 	return moveSequences
 
 }
 
-func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[][]BoardMove) {
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[][]BoardMove, boardMoveSeqParam []BoardMove) [][]BoardMove {
+
+	discoveredBoardMoveSeqs := [][]BoardMove{}
 
 	boardMoveSeq := (*boardMoveSequences)[len(*boardMoveSequences)-1]
 
@@ -296,11 +309,15 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[
 	jumpMoves := board.alternateSingleStepJumpPaths(player, curLocation)
 	if len(jumpMoves) == 0 {
 		// we are done!  we hit terminal state
+		discoveredBoardMoveSeqs = append(discoveredBoardMoveSeqs, boardMoveSeqParam)
 		logg.Log("return from recursive, dump")
-		dumpBoardMoveSequences(*boardMoveSequences)
+		dumpBoardMoveSequences(discoveredBoardMoveSeqs)
 		logg.Log("/ return from recursive, dump")
-		return
+
+		return discoveredBoardMoveSeqs
 	}
+
+	boardMoveSeqParamSnapshot := copyBoardMoveSeq(boardMoveSeqParam)
 
 	for i, jumpMove := range jumpMoves {
 
@@ -313,6 +330,8 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[
 			newBoardMoveSeq := append(boardMoveSeq, jumpMove)
 			(*boardMoveSequences)[len(*boardMoveSequences)-1] = newBoardMoveSeq
 
+			boardMoveSeqParam = append(boardMoveSeqParamSnapshot, jumpMove)
+
 		} else {
 			// for all other moves in the fork, we need to copy the
 			// current boardMoveSeq and add it to boardMoveSeqeunces
@@ -324,25 +343,37 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[
 				newBoardMoveSeq,
 			)
 
+			boardMoveSeqParam = append(boardMoveSeqParamSnapshot, jumpMove)
+
 		}
 
-		boardPostMove.recursiveExplodeJumpMove(
+		upstream := boardPostMove.recursiveExplodeJumpMove(
 			player,
 			boardMoveSequences,
+			boardMoveSeqParam,
 		)
+		discoveredBoardMoveSeqs = append(discoveredBoardMoveSeqs, upstream...)
+
+		logg.Log("upstream")
+		dumpBoardMoveSequences(upstream)
+		logg.Log("/ upstream")
 
 	}
+
+	return discoveredBoardMoveSeqs
 
 }
 
 func dumpBoardMoveSequences(boardMoveSequences [][]BoardMove) {
 
-	for i, boardMoveSequence := range boardMoveSequences {
-		for j, boardMove := range boardMoveSequence {
-			if boardMove.move.IsInitialized() {
-				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
-			}
+	for _, boardMoveSequence := range boardMoveSequences {
+		moves := []Move{}
+		for _, boardMove := range boardMoveSequence {
+			moves = append(moves, boardMove.move)
 		}
+		move := NewMove(moves)
+		logg.Log("move: %v", move.compactString())
+
 	}
 
 }
