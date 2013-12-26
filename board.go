@@ -282,14 +282,16 @@ func (board Board) explodeJumpMoveDriver(player Player, startingMove Move) [][]M
 	boardMoveSequences := [][]BoardMove{}
 	boardMoveSequences = append(boardMoveSequences, boardMoveSeq)
 
-	boardPostMove.recursiveExplodeJumpMove(player, boardMoveSeq, &boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(player, &boardMoveSequences)
 
 	moveSequences := convertToMoveSequences(boardMoveSequences)
 	return moveSequences
 
 }
 
-func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardMove, boardMoveSequences *[][]BoardMove) {
+func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSequences *[][]BoardMove) {
+
+	boardMoveSeq := (*boardMoveSequences)[len(*boardMoveSequences)-1]
 
 	// find out where we currently are in the jump sequence
 	lastBoardMove := boardMoveSeq[len(boardMoveSeq)-1]
@@ -298,12 +300,11 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 	jumpMoves := board.alternateSingleStepJumpPaths(player, curLocation)
 	if len(jumpMoves) == 0 {
 		// we are done!  we hit terminal state
+		logg.Log("return from recursive, dump")
+		dumpBoardMoveSequences(*boardMoveSequences)
+		logg.Log("/ return from recursive, dump")
 		return
 	}
-
-	// make a snapshot of the board move sequence being considered
-	boardMoveSeqSnapshot := copyBoardMoveSeq(boardMoveSeq)
-	newBoardMoveSeq := copyBoardMoveSeq(boardMoveSeq)
 
 	for i, jumpMove := range jumpMoves {
 
@@ -313,14 +314,14 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 		if i == 0 {
 			// first move in the fork, add it to the current boardMoveSeq
 			// and make recursive call
-			newBoardMoveSeq = append(newBoardMoveSeq, jumpMove)
+			newBoardMoveSeq := append(boardMoveSeq, jumpMove)
 			(*boardMoveSequences)[len(*boardMoveSequences)-1] = newBoardMoveSeq
 
 		} else {
 			// for all other moves in the fork, we need to copy the
 			// current boardMoveSeq and add it to boardMoveSeqeunces
-			// and make recursive call.  (don't forget to use new index!)
-			newBoardMoveSeq = copyBoardMoveSeq(boardMoveSeqSnapshot)
+			// and make recursive call.
+			newBoardMoveSeq := copyBoardMoveSeq(boardMoveSeq)
 			newBoardMoveSeq = append(newBoardMoveSeq, jumpMove)
 			*boardMoveSequences = append(
 				*boardMoveSequences,
@@ -331,7 +332,6 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 
 		boardPostMove.recursiveExplodeJumpMove(
 			player,
-			newBoardMoveSeq,
 			boardMoveSequences,
 		)
 

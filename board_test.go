@@ -2,7 +2,7 @@ package checkerscore
 
 import (
 	"github.com/couchbaselabs/go.assert"
-	"github.com/couchbaselabs/logg"
+	_ "github.com/couchbaselabs/logg"
 	"testing"
 )
 
@@ -304,7 +304,7 @@ func DISTestRecursiveExplodeJumpMove1(t *testing.T) {
 	boardMoveSequences := make([][]BoardMove, 1000)
 	boardMoveSequences[0] = boardMoveSeq
 
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &boardMoveSequences)
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, &boardMoveSequences)
 
 	finalBoardMoveSeq := boardMoveSequences[0]
 	boardMoveAdded := finalBoardMoveSeq[1]
@@ -351,14 +351,15 @@ func TestRecursiveExplodeJumpMove2(t *testing.T) {
 	boardMoveSequences := make([][]BoardMove, 1)
 	boardMoveSequences[0] = boardMoveSeq
 
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, boardMoveSeq, &boardMoveSequences)
-	for i, boardMoveSequence := range boardMoveSequences {
-		for j, boardMove := range boardMoveSequence {
-			if boardMove.move.IsInitialized() {
-				logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, &boardMoveSequences)
+	/*	for i, boardMoveSequence := range boardMoveSequences {
+			for j, boardMove := range boardMoveSequence {
+				if boardMove.move.IsInitialized() {
+					// logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
+				}
 			}
 		}
-	}
+	*/
 
 }
 
