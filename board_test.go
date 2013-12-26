@@ -181,7 +181,7 @@ func TestAlternateSingleStepJumpPaths(t *testing.T) {
 
 }
 
-func TestDoubleJumpMovesForLocation(t *testing.T) {
+func TestDoubleJumpMovesForLocationEasy(t *testing.T) {
 
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -204,7 +204,11 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 	}
 	assertMovesContains(t, moves, expected)
 
-	currentBoardStr = "" +
+}
+
+func TestDoubleJumpMovesForLocationMedium(t *testing.T) {
+
+	currentBoardStr := "" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
@@ -214,19 +218,23 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
-	board = NewBoard(currentBoardStr)
-	loc = Location{row: 4, col: 0}
-	moves = board.legalMovesForLocation(RED_PLAYER, loc)
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 4, col: 0}
+	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 
 	assert.Equals(t, len(moves), 2)
 
-	expected = []string{
+	expected := []string{
 		"{{(4,0)->(4,0)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,2)},{(2,2)->(4,0)}]}",
 		"{{(4,0)->(4,0)},[{(4,0)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,2)},{(6,2)->(4,0)}]}",
 	}
 	assertMovesContains(t, moves, expected)
 
-	currentBoardStr = "" +
+}
+
+func TestDoubleJumpMovesForLocationHard(t *testing.T) {
+
+	currentBoardStr := "" +
 		"|- - - - - - - -|" +
 		"|- - - o - o - -|" +
 		"|- - - - - - - -|" +
@@ -235,11 +243,11 @@ func TestDoubleJumpMovesForLocation(t *testing.T) {
 		"|- o - o - o - -|" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
-	board = NewBoard(currentBoardStr)
-	loc = Location{row: 4, col: 0}
-	moves = board.legalMovesForLocation(RED_PLAYER, loc)
+	board := NewBoard(currentBoardStr)
+	loc := Location{row: 4, col: 0}
+	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 
-	expected = []string{
+	expected := []string{
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(6,6)}]}",
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)},{(2,2)->(4,4)},{(4,4)->(6,6)}]}",
 		"{{(4,0)->(4,0)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(2,6)},{(2,6)->(0,4)},{(0,4)->(2,2)},{(2,2)->(4,0)}]}",
@@ -267,100 +275,6 @@ func assertMovesContains(t *testing.T, actualMoves []Move, expectedMoves []strin
 		assert.True(t, found)
 
 	}
-}
-
-func DISTestRecursiveExplodeJumpMove1(t *testing.T) {
-
-	currentBoardStr := "" +
-		"|- - - - - - - -|" +
-		"|- - - o - - - -|" +
-		"|- - - - - - - -|" +
-		"|- o - - - - - -|" +
-		"|X - - - - - - -|" +
-		"|- - - - - - - -|" +
-		"|- - - - - - - -|" +
-		"|- - - - - - - -|"
-
-	board := NewBoard(currentBoardStr)
-
-	from := Location{row: 4, col: 0}
-	over := Location{row: 3, col: 1}
-	to := Location{row: 2, col: 2}
-	startingMove := Move{
-		from: from,
-		over: over,
-		to:   to,
-	}
-
-	boardPostMove := board.applyMove(RED_PLAYER, startingMove)
-	boardMove := BoardMove{
-		board: boardPostMove,
-		move:  startingMove,
-	}
-
-	boardMoveSeq := make([]BoardMove, 1000)
-	boardMoveSeq[0] = boardMove
-
-	boardMoveSequences := make([][]BoardMove, 1000)
-	boardMoveSequences[0] = boardMoveSeq
-
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, &boardMoveSequences)
-
-	finalBoardMoveSeq := boardMoveSequences[0]
-	boardMoveAdded := finalBoardMoveSeq[1]
-	assert.Equals(t, boardMoveAdded.move.to.row, 0)
-	assert.Equals(t, boardMoveAdded.move.to.col, 4)
-
-	boardMoveNonExistent := finalBoardMoveSeq[2]
-	assert.False(t, boardMoveNonExistent.move.IsInitialized())
-
-}
-
-func TestRecursiveExplodeJumpMove2(t *testing.T) {
-
-	currentBoardStr := "" +
-		"|- - - - - - - -|" +
-		"|- o - o - - - -|" +
-		"|- - - - - - - -|" +
-		"|- o - o - o - -|" +
-		"|X - - - - - - -|" +
-		"|- o - o - o - -|" +
-		"|- - - - - - - -|" +
-		"|- - - - - - - -|"
-
-	board := NewBoard(currentBoardStr)
-
-	from := Location{row: 4, col: 0}
-	over := Location{row: 3, col: 1}
-	to := Location{row: 2, col: 2}
-	startingMove := Move{
-		from: from,
-		over: over,
-		to:   to,
-	}
-
-	boardPostMove := board.applyMove(RED_PLAYER, startingMove)
-	boardMove := BoardMove{
-		board: boardPostMove,
-		move:  startingMove,
-	}
-
-	boardMoveSeq := make([]BoardMove, 1)
-	boardMoveSeq[0] = boardMove
-
-	boardMoveSequences := make([][]BoardMove, 1)
-	boardMoveSequences[0] = boardMoveSeq
-
-	boardPostMove.recursiveExplodeJumpMove(RED_PLAYER, &boardMoveSequences)
-	/*	for i, boardMoveSequence := range boardMoveSequences {
-			for j, boardMove := range boardMoveSequence {
-				if boardMove.move.IsInitialized() {
-					// logg.Log("i: %d, j: %d move: %v", i, j, boardMove.move)
-				}
-			}
-		}
-	*/
-
 }
 
 func TestJumpMovesForLocation(t *testing.T) {
