@@ -87,12 +87,14 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
 	for _, jumpMove := range jumpMoves {
-		if board.canExplodeJumpMove(player, jumpMove) {
-			jumpMoveSequences := board.explodeJumpMoveDriver(player, jumpMove)
+
+		jumpMoveSequences := board.explodeJumpMoveDriver(player, jumpMove)
+		if len(jumpMoveSequences[0]) > 0 {
 			for _, moveSequence := range jumpMoveSequences {
 				multiJumpMove := NewMove(moveSequence)
 				moves = append(moves, multiJumpMove)
 			}
+
 		} else {
 			moves = append(moves, jumpMove)
 		}
@@ -106,12 +108,6 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 	}
 
 	return moves
-}
-
-func (board Board) canExplodeJumpMove(player Player, startingMove Move) bool {
-	jumpMoveSequences := board.explodeJumpMoveDriver(player, startingMove)
-	canExplode := len(jumpMoveSequences[0]) > 0
-	return canExplode
 }
 
 // Given a starting jump move, return a slice of move slices, where each slice
