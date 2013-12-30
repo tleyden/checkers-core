@@ -35,6 +35,16 @@ func NewBoardFromBoard(otherBoard Board) Board {
 	return board
 }
 
+func NewEmptyBoard() Board {
+	board := Board{}
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			board[row][col] = EMPTY
+		}
+	}
+	return board
+}
+
 func NewBoard(compactBoard string) Board {
 
 	board := Board{}
@@ -420,6 +430,10 @@ func (board Board) canJump(player Player, start, intermediate, dest Location) bo
 
 func (board Board) pieceAt(loc Location) Piece {
 	return board[loc.row][loc.col]
+}
+
+func (board Board) PieceAt(loc Location) Piece {
+	return board.pieceAt(loc)
 }
 
 /*

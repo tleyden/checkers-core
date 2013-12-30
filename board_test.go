@@ -21,6 +21,7 @@ func TestNewBoard(t *testing.T) {
 	board := NewBoard(boardStr)
 	assert.Equals(t, int(board[0][0]), int(EMPTY)) // TODO: why is cast to int() needed?
 	assert.Equals(t, int(board[0][1]), int(RED))
+	assert.Equals(t, int(board[1][0]), int(RED))
 	assert.Equals(t, int(board[7][0]), int(BLACK))
 	assert.Equals(t, int(board[7][7]), int(EMPTY))
 
