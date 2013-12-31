@@ -25,3 +25,7 @@ func (loc Location) Row() int {
 func (loc Location) Col() int {
 	return loc.col
 }
+
+func (loc Location) Equals(otherLoc Location) bool {
+	return loc.row == otherLoc.row && loc.col == otherLoc.col
+}

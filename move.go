@@ -22,6 +22,13 @@ type BoardMove struct {
 	move  Move
 }
 
+func NewMoveFromTo(from, to Location) Move {
+	return Move{
+		from: from,
+		to:   to,
+	}
+}
+
 func NewMove(moveSequence []Move) Move {
 
 	if len(moveSequence) == 0 {
@@ -99,6 +106,14 @@ func (move Move) compactStringWithoutSubmoves() string {
 	to := fmt.Sprintf("(%d,%d)", move.to.row, move.to.col)
 	from_to := fmt.Sprintf("{%v->%v}", from, to)
 	return from_to
+}
+
+func (move Move) From() Location {
+	return move.from
+}
+
+func (move Move) To() Location {
+	return move.to
 }
 
 func (move Move) String() string {
