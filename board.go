@@ -9,11 +9,11 @@ import (
 type Piece int
 
 const (
-	EMPTY      = 0
-	RED        = 1
-	RED_KING   = 2
-	BLACK      = 3
-	BLACK_KING = 4
+	EMPTY = Piece(iota)
+	RED
+	RED_KING
+	BLACK
+	BLACK_KING
 )
 
 type Player int
