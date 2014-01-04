@@ -25,6 +25,24 @@ const (
 
 type Board [8][8]Piece
 
+func (p Piece) String() string {
+
+	switch p {
+	case EMPTY:
+		return "-"
+	case BLACK:
+		return "o" // TODO: use unicode ●
+	case BLACK_KING:
+		return "O" // TODO: use unicode ♚
+	case RED:
+		return "x" // TODO: use unicode ○
+	case RED_KING:
+		return "X" // TODO: use unicode ♔
+	}
+	panic("Unknown piece")
+
+}
+
 func NewBoardFromBoard(otherBoard Board) Board {
 	board := Board{}
 	for row := 0; row < 8; row++ {
@@ -458,18 +476,8 @@ func (board Board) CompactString() string {
 		for col := 0; col < 8; col++ {
 			loc := Location{row: row, col: col}
 			piece := board.pieceAt(loc)
-			switch {
-			case piece == EMPTY:
-				buffer.WriteString("-")
-			case piece == BLACK:
-				buffer.WriteString("o")
-			case piece == BLACK_KING:
-				buffer.WriteString("O")
-			case piece == RED:
-				buffer.WriteString("x")
-			case piece == RED_KING:
-				buffer.WriteString("X")
-			}
+			buffer.WriteString(piece.String())
+
 			if col < 7 {
 				buffer.WriteString(" ")
 			}

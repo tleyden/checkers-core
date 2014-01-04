@@ -2,6 +2,7 @@ package checkerscore
 
 import (
 	"github.com/couchbaselabs/go.assert"
+	"github.com/couchbaselabs/logg"
 	_ "github.com/couchbaselabs/logg"
 	"testing"
 )
@@ -176,6 +177,7 @@ func TestApplyMoveWithSubmoves(t *testing.T) {
 		"|- - - - - - - -|"
 
 	board := NewBoard(currentBoardStr)
+
 	loc := Location{row: 4, col: 0}
 	moves := board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
@@ -427,5 +429,26 @@ func TestLegalMoves(t *testing.T) {
 
 	legalMoves = board.LegalMoves(RED_PLAYER)
 	assert.Equals(t, len(legalMoves), 7)
+
+	currentBoardStr = "" +
+		"|- o - o - o - o|" +
+		"|- - o - o - o -|" +
+		"|- o - o - o - o|" +
+		"|- - o - x - - -|" +
+		"|- - - - - - - -|" +
+		"|x - - - x - x -|" +
+		"|- x - x - x - x|" +
+		"|x - x - x - x -|"
+	board = NewBoard(currentBoardStr)
+
+	legalMoves = board.LegalMoves(BLACK_PLAYER)
+	logg.Log("legalMoves: %v", legalMoves)
+
+	illegalMove := Move{
+		from: Location{row: 0, col: 1},
+		to:   Location{row: 1, col: 0},
+	}
+
+	assert.False(t, illegalMove.ContainedIn(legalMoves))
 
 }

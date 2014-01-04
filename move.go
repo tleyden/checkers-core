@@ -119,3 +119,25 @@ func (move Move) To() Location {
 func (move Move) String() string {
 	return move.compactString()
 }
+
+func (move Move) ContainedIn(moves []Move) bool {
+	for _, curMove := range moves {
+		if move.Equals(curMove) {
+			return true
+		}
+	}
+	return false
+}
+
+func (move Move) Equals(otherMove Move) bool {
+
+	// TODO: fix this!! it's totally broken, because
+	// TODO: moves can end up at the same place but
+	// TODO: have different paths (eg, different set of submoves)
+	// TODO: and should not be equal.
+	// TODO: first, write test that proves this is broken.  then fix it.
+
+	return move.To().Equals(otherMove.To()) &&
+		move.From().Equals(otherMove.From())
+
+}
