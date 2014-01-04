@@ -145,9 +145,11 @@ func lexInsideRow(l *lexer) stateFn {
 			return lexOutsideRow // Next state.
 		}
 		switch r := l.next(); {
-		case r == eof || r == '\n':
+		case r == eof:
 			return l.errorf("unclosed action")
 		case isSpace(r):
+			l.ignore()
+		case r == '\n':
 			l.ignore()
 		case r == squareEmpty:
 			l.emit(itemSquareEmpty)

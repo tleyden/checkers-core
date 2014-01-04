@@ -9,7 +9,7 @@ import (
 func TestLexer(t *testing.T) {
 
 	name := "testlexer"
-	inputString := "| - x X - o O || x |"
+	inputString := "| - x X -\n o O || x |"
 
 	_, tokensChannel := lex(name, inputString)
 
