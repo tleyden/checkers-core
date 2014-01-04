@@ -7,6 +7,8 @@ import (
 
 type Board [8][8]Piece
 
+type EvaluationFunction func(player Player, board Board) float64
+
 func NewBoardFromBoard(otherBoard Board) Board {
 	board := Board{}
 	for row := 0; row < 8; row++ {
@@ -91,16 +93,62 @@ func (board Board) LegalMoves(p Player) []Move {
 /*
 Minimax Search
 
+Find the best legal move for player, searching to the specified depth.
+Returns a tuple (move, score), where score is the guaranteed minimum
+score achievable for player if the move is made.
 
 References:
   - Peter Norvig's Artificial Intelligence: A modern approach (pp 150)
   - @dhconnelly's python implementation of othello: https://github.com/dhconnelly/paip-python/blob/master/paip/othello.py
+*/
 
+func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, score float64) {
 
-func (board Board) Minimax(p Player) (move Move, minScore float64) {
+	m = Move{}
+
+	// We define the value of a board to be the opposite of its value to our
+	// opponent, computed by recursively applying `minimax` for our opponent.
+	valueFunction := func(board Board) float64 {
+		_, opponentScore := board.Minimax(p.Opponent(), depth-1, eval)
+		return -1.0 * opponentScore
+	}
+
+	// When depth is zero, don't examine possible moves--just determine the value
+	// of this board to the player.
+	if depth == 0 {
+		score = eval(p, b)
+		return
+	}
+
+	// We want to evaluate all the legal moves by considering their implications
+	// `depth` turns in advance.  First, find all the legal moves.
+	moves := b.LegalMoves(p)
+
+	// If player has no legal moves, panic for now
+	// TODO: fix this
+	if len(moves) == 0 {
+		panic("No legal moves!")
+		return
+	}
+
+	// When there are multiple legal moves available, choose the best one by
+	// maximizing the value of the resulting boards.
+
+	// return max((value(make_move(m, player, list(board))), m) for m in moves)
+	maxValueSeen := -99999999.0
+	for _, move := range moves {
+		boardPostMove := b.applyMove(p, move)
+		boardValue := valueFunction(boardPostMove)
+		if boardValue > maxValueSeen {
+			maxValueSeen = boardValue
+			m = move
+			score = boardValue
+		}
+	}
+
+	return
 
 }
-*/
 
 // Compute the difference between the sum of the weights of player's
 // squares and the sum of the weights of opponent's squares.

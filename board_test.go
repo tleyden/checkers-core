@@ -376,7 +376,39 @@ func TestNonJumpMovesForLocation(t *testing.T) {
 
 }
 
+func TestMinimax(t *testing.T) {
+
+	currentBoardStr := "" +
+		"|- - - - - - o -|" +
+		"|- - - - - - - -|" +
+		"|- - - o - - - -|" +
+		"|- - x - x - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - x -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	evalFunc := func(player Player, board Board) float64 {
+		return board.WeightedScore(player)
+	}
+	board := NewBoard(currentBoardStr)
+	depth := 0
+	_, blackScore := board.Minimax(BLACK_PLAYER, depth, evalFunc)
+	_, redScore := board.Minimax(RED_PLAYER, depth, evalFunc)
+	assert.True(t, redScore > blackScore)
+	logg.Log("blackScore: %v, red: %v", blackScore, redScore)
+
+	// after taking a double jump, black will have 2 pieces
+	// to red's 1 piece, and so the min score should be 1.0
+	depth = 1
+	_, blackScorePost1Move := board.Minimax(BLACK_PLAYER, depth, evalFunc)
+	logg.Log("blackScore: %v", blackScorePost1Move)
+	assert.Equals(t, blackScorePost1Move, 1.0)
+
+}
+
 func TestWeightedScore(t *testing.T) {
+
 	currentBoardStr := "" +
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|" +
@@ -390,6 +422,7 @@ func TestWeightedScore(t *testing.T) {
 	board := NewBoard(currentBoardStr)
 	blackScore := board.WeightedScore(BLACK_PLAYER)
 	redScore := board.WeightedScore(RED_PLAYER)
+	// logg.Log("blackScore: %v, red: %v", blackScore, redScore)
 	assert.True(t, blackScore > redScore)
 
 }
