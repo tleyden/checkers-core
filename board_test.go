@@ -376,6 +376,24 @@ func TestNonJumpMovesForLocation(t *testing.T) {
 
 }
 
+func TestWeightedScore(t *testing.T) {
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- o - o - - - -|" +
+		"|X - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+
+	board := NewBoard(currentBoardStr)
+	blackScore := board.WeightedScore(BLACK_PLAYER)
+	redScore := board.WeightedScore(RED_PLAYER)
+	assert.True(t, blackScore > redScore)
+
+}
+
 func TestLegalMovesForLocation(t *testing.T) {
 
 	currentBoardStr := "" +

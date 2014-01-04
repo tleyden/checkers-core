@@ -5,43 +5,7 @@ import (
 	"github.com/couchbaselabs/logg"
 )
 
-// the possible contents of a square
-type Piece int
-
-const (
-	EMPTY = Piece(iota)
-	RED
-	RED_KING
-	BLACK
-	BLACK_KING
-)
-
-type Player int
-
-const (
-	RED_PLAYER   = 0
-	BLACK_PLAYER = 1
-)
-
 type Board [8][8]Piece
-
-func (p Piece) String() string {
-
-	switch p {
-	case EMPTY:
-		return "-"
-	case BLACK:
-		return "o" // TODO: use unicode ●
-	case BLACK_KING:
-		return "O" // TODO: use unicode ♚
-	case RED:
-		return "x" // TODO: use unicode ○
-	case RED_KING:
-		return "X" // TODO: use unicode ♔
-	}
-	panic("Unknown piece")
-
-}
 
 func NewBoardFromBoard(otherBoard Board) Board {
 	board := Board{}
@@ -122,6 +86,45 @@ func (board Board) LegalMoves(p Player) []Move {
 	}
 
 	return moves
+}
+
+/*
+Minimax Search
+
+
+References:
+  - Peter Norvig's Artificial Intelligence: A modern approach (pp 150)
+  - @dhconnelly's python implementation of othello: https://github.com/dhconnelly/paip-python/blob/master/paip/othello.py
+
+
+func (board Board) Minimax(p Player) (move Move, minScore float64) {
+
+}
+*/
+
+// Compute the difference between the sum of the weights of player's
+// squares and the sum of the weights of opponent's squares.
+func (board Board) WeightedScore(player Player) float64 {
+	total := 0.0
+	calculateLocationValue := func(loc Location) {
+		piece := board.PieceAt(loc)
+		if piece.OwnedBy(player) {
+			total += piece.WeightedValue()
+		} else {
+			total -= piece.WeightedValue()
+		}
+	}
+	board.applyEachSquare(calculateLocationValue)
+	return total
+}
+
+func (board Board) applyEachSquare(f func(loc Location)) {
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			loc := Location{row: row, col: col}
+			f(loc)
+		}
+	}
 }
 
 func (board Board) legalMovesForLocation(p Player, loc Location) (moves []Move, hasJumps bool) {
