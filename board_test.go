@@ -196,7 +196,7 @@ func TestApplyMoveWithSubmoves(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
-	assert.Equals(t, expectedBoardStr, boardPostMove.CompactString())
+	assert.Equals(t, expectedBoardStr, boardPostMove.CompactString(false))
 
 }
 
@@ -401,9 +401,39 @@ func TestMinimax(t *testing.T) {
 	// after taking a double jump, black will have 2 pieces
 	// to red's 1 piece, and so the min score should be 1.0
 	depth = 1
-	_, blackScorePost1Move := board.Minimax(BLACK_PLAYER, depth, evalFunc)
+	bestMove, blackScorePost1Move := board.Minimax(BLACK_PLAYER, depth, evalFunc)
 	logg.Log("blackScore: %v", blackScorePost1Move)
+	logg.Log("bestMove: %v", bestMove)
 	assert.Equals(t, blackScorePost1Move, 1.0)
+	assert.Equals(t, bestMove.To(), Location{row: 6, col: 7})
+
+	// the black piece is trapped and so if the red piece moves
+	// forward one piece, it will capture it when the black
+	// piece has to move forward
+	currentBoardStr = "" +
+		"|- - - - - - - o|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - x - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+	board = NewBoard(currentBoardStr)
+	depth = 3
+	bestMove, scorePostMove := board.Minimax(RED_PLAYER, depth, evalFunc)
+	logg.Log("score: %v", scorePostMove)
+	logg.Log("bestMove: %v", bestMove)
+	assert.True(t, scorePostMove >= 1.0)
+	assert.Equals(t, bestMove.To(), Location{row: 2, col: 5})
+
+	// TODO: test scenario when the game is over
+	/*
+		depth = 5
+		bestMove, scorePostMove = board.Minimax(RED_PLAYER, depth, evalFunc)
+		logg.Log("score: %v", scorePostMove)
+		logg.Log("bestMove: %v", bestMove)
+	*/
 
 }
 

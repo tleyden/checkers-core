@@ -128,7 +128,6 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 	// TODO: fix this
 	if len(moves) == 0 {
 		panic("No legal moves!")
-		return
 	}
 
 	// When there are multiple legal moves available, choose the best one by
@@ -138,7 +137,9 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 	maxValueSeen := -99999999.0
 	for _, move := range moves {
 		boardPostMove := b.applyMove(p, move)
+		logg.Log("boardPostMove: %v", boardPostMove.CompactString(true))
 		boardValue := valueFunction(boardPostMove)
+		logg.Log("boardVal: %v", boardValue)
 		if boardValue > maxValueSeen {
 			maxValueSeen = boardValue
 			m = move
@@ -350,6 +351,8 @@ func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []B
 
 func (board Board) applyMove(player Player, move Move) Board {
 
+	// TODO!!! Kinging not supported.  Write test to detect this.
+
 	piece := board.pieceAt(move.from)
 	boardPostMove := NewBoardFromBoard(board)
 
@@ -530,12 +533,17 @@ Convert to a string that looks like:
 		"|- - - - - - - -|" +
 		"|x - x - o - x -|" +
 		"|- x - x - x - x|" +
-		"|x - x - x - x -|"
+		"
+|x - x - x - x -|"
 
 */
-func (board Board) CompactString() string {
+func (board Board) CompactString(addNewlines bool) string {
 
 	buffer := bytes.Buffer{}
+	if addNewlines {
+		buffer.WriteString("\n")
+	}
+
 	for row := 0; row < 8; row++ {
 		buffer.WriteString("|")
 		for col := 0; col < 8; col++ {
@@ -548,6 +556,10 @@ func (board Board) CompactString() string {
 			}
 		}
 		buffer.WriteString("|")
+		if addNewlines {
+			buffer.WriteString("\n")
+		}
+
 	}
 	return buffer.String()
 
