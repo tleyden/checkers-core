@@ -124,13 +124,13 @@ func (board Board) LegalMoves(p Player) []Move {
 	return moves
 }
 
-func (board Board) legalMovesForLocation(player Player, loc Location) ([]Move, bool) {
-	moves := []Move{}
+func (board Board) legalMovesForLocation(p Player, loc Location) (moves []Move, hasJumps bool) {
 
-	jumpMoves := board.singleJumpMovesForLocation(player, loc)
+	moves = []Move{}
+	jumpMoves := board.singleJumpMovesForLocation(p, loc)
 	for _, jumpMove := range jumpMoves {
 
-		jumpMoveSequences := board.explodeJumpMove(player, jumpMove)
+		jumpMoveSequences := board.explodeJumpMove(p, jumpMove)
 		if len(jumpMoveSequences[0]) > 0 {
 			for _, moveSequence := range jumpMoveSequences {
 				multiJumpMove := NewMove(moveSequence)
@@ -145,12 +145,12 @@ func (board Board) legalMovesForLocation(player Player, loc Location) ([]Move, b
 
 	// only check for non-jump moves if we don't have any jump moves
 	if len(jumpMoves) == 0 {
-		nonJumpMoves := board.nonJumpMovesForLocation(player, loc)
+		nonJumpMoves := board.nonJumpMovesForLocation(p, loc)
 		moves = append(moves, nonJumpMoves...)
 	}
-	hasJumpMoves := (len(jumpMoves) > 0)
+	hasJumps = (len(jumpMoves) > 0)
 
-	return moves, hasJumpMoves
+	return
 }
 
 // Given a starting jump move, return a slice of move slices, where each slice
