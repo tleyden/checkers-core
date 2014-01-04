@@ -22,6 +22,8 @@ type BoardMove struct {
 	move  Move
 }
 
+type MoveFilter func(move Move) bool
+
 func NewMoveFromTo(from, to Location) Move {
 	return Move{
 		from: from,
@@ -140,4 +142,14 @@ func (move Move) Equals(otherMove Move) bool {
 	return move.To().Equals(otherMove.To()) &&
 		move.From().Equals(otherMove.From())
 
+}
+
+func filterMoves(moves []Move, filter MoveFilter) []Move {
+	filteredMoves := []Move{}
+	for _, move := range moves {
+		if filter(move) {
+			filteredMoves = append(filteredMoves, move)
+		}
+	}
+	return filteredMoves
 }

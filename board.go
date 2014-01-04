@@ -96,22 +96,35 @@ func NewBoard(compactBoard string) Board {
 	return board
 }
 
-func (board Board) LegalMoves(player Player) []Move {
+func (board Board) LegalMoves(p Player) []Move {
 
 	moves := []Move{}
+	foundJumpMove := false
 
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
-			location := Location{row: row, col: col}
-			movesForLocation := board.legalMovesForLocation(player, location)
+			loc := Location{row: row, col: col}
+			movesForLocation, hasJumpMove := board.legalMovesForLocation(p, loc)
 			moves = append(moves, movesForLocation...)
+			if hasJumpMove {
+				foundJumpMove = true
+			}
 		}
+	}
+
+	// if we found any jump moves for any location, then filter out
+	// all non-jump moves
+	if foundJumpMove {
+		filterNonJumpMoves := func(move Move) bool {
+			return move.IsJump()
+		}
+		moves = filterMoves(moves, filterNonJumpMoves)
 	}
 
 	return moves
 }
 
-func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
+func (board Board) legalMovesForLocation(player Player, loc Location) ([]Move, bool) {
 	moves := []Move{}
 
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
@@ -135,8 +148,9 @@ func (board Board) legalMovesForLocation(player Player, loc Location) []Move {
 		nonJumpMoves := board.nonJumpMovesForLocation(player, loc)
 		moves = append(moves, nonJumpMoves...)
 	}
+	hasJumpMoves := (len(jumpMoves) > 0)
 
-	return moves
+	return moves, hasJumpMoves
 }
 
 // Given a starting jump move, return a slice of move slices, where each slice

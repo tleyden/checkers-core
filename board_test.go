@@ -179,7 +179,7 @@ func TestApplyMoveWithSubmoves(t *testing.T) {
 	board := NewBoard(currentBoardStr)
 
 	loc := Location{row: 4, col: 0}
-	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	moves, _ := board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
 
 	move := moves[0]
@@ -233,7 +233,7 @@ func TestDoubleJumpMovesForLocationEasy(t *testing.T) {
 
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
-	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	moves, _ := board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
 	expected := []string{
@@ -258,7 +258,7 @@ func TestDoubleJumpMovesForLocationMedium(t *testing.T) {
 
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
-	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	moves, _ := board.legalMovesForLocation(RED_PLAYER, loc)
 
 	assert.Equals(t, len(moves), 2)
 
@@ -283,7 +283,7 @@ func TestDoubleJumpMovesForLocationHard(t *testing.T) {
 		"|- - - - - - - -|"
 	board := NewBoard(currentBoardStr)
 	loc := Location{row: 4, col: 0}
-	moves := board.legalMovesForLocation(RED_PLAYER, loc)
+	moves, _ := board.legalMovesForLocation(RED_PLAYER, loc)
 
 	expected := []string{
 		"{{(4,0)->(6,6)},[{(4,0)->(6,2)},{(6,2)->(4,4)},{(4,4)->(6,6)}]}",
@@ -390,18 +390,18 @@ func TestLegalMovesForLocation(t *testing.T) {
 	board := NewBoard(currentBoardStr)
 
 	loc := Location{row: 2, col: 3}
-	moves := board.legalMovesForLocation(BLACK_PLAYER, loc)
+	moves, _ := board.legalMovesForLocation(BLACK_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
 	move := moves[0]
 	assert.Equals(t, move.to.row, 4)
 	assert.Equals(t, move.to.col, 5)
 
 	loc = Location{row: 2, col: 1}
-	moves = board.legalMovesForLocation(BLACK_PLAYER, loc)
+	moves, _ = board.legalMovesForLocation(BLACK_PLAYER, loc)
 	assert.Equals(t, len(moves), 2)
 
 	loc = Location{row: 5, col: 0}
-	moves = board.legalMovesForLocation(RED_PLAYER, loc)
+	moves, _ = board.legalMovesForLocation(RED_PLAYER, loc)
 	assert.Equals(t, len(moves), 1)
 
 }
