@@ -122,8 +122,8 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 	// `depth` turns in advance.  First, find all the legal moves.
 	moves := b.LegalMoves(p)
 
-	// If player has no legal moves, panic for now
-	// TODO: fix this
+	// If player has no legal moves, don't examine possible moves -- just
+	// determine the value of this board to the player.
 	if len(moves) == 0 {
 		score = eval(p, b)
 		return
@@ -131,7 +131,6 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 
 	// When there are multiple legal moves available, choose the best one by
 	// maximizing the value of the resulting boards.
-
 	maxValueSeen := -99999999.0
 	for _, move := range moves {
 		boardPostMove := b.ApplyMove(p, move)
