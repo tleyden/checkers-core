@@ -76,3 +76,35 @@ func (piece Piece) OwnedBy(player Player) bool {
 
 	}
 }
+
+func (piece Piece) IsKing() bool {
+	switch piece {
+	case BLACK:
+		return false
+	case BLACK_KING:
+		return true
+	case RED:
+		return false
+	case RED_KING:
+		return true
+	default:
+		return false
+	}
+
+}
+
+func (piece Piece) King() Piece {
+	switch piece {
+	case BLACK:
+		return BLACK_KING
+	case BLACK_KING:
+		return piece
+	case RED:
+		return RED_KING
+	case RED_KING:
+		return piece
+	default:
+		return piece
+	}
+
+}

@@ -28,6 +28,24 @@ func TestNewBoard(t *testing.T) {
 
 }
 
+func TestIsOnOpponentsFirstRank(t *testing.T) {
+	currentBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - x - - - - -|" +
+		"|- - - O - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - X - - -|" +
+		"|- - - o - - - -|" +
+		"|- o - - - - - -|"
+	board := NewBoard(currentBoardStr)
+	shouldBeKing := Location{row: 7, col: 1}
+	nonKingPiece := Location{row: 6, col: 3}
+	assert.False(t, board.isOnOpponentsFirstRank(nonKingPiece, BLACK_PLAYER))
+	assert.True(t, board.isOnOpponentsFirstRank(shouldBeKing, BLACK_PLAYER))
+
+}
+
 func TestKingCanMoveBackwards(t *testing.T) {
 
 	currentBoardStr := "" +
@@ -161,6 +179,33 @@ func TestApplyMove(t *testing.T) {
 	assert.True(t, boardPostMove.pieceAt(from) == EMPTY)
 	assert.True(t, boardPostMove.pieceAt(over) == EMPTY)
 	assert.True(t, boardPostMove.pieceAt(to) == board.pieceAt(from))
+
+	// make sure when black moves it becomes a king
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- x - - - - - -|" +
+		"|- - - - - o - -|" +
+		"|- - - - - - - -|"
+	board = NewBoard(currentBoardStr)
+	move = Move{
+		from: Location{row: 6, col: 5},
+		to:   Location{row: 7, col: 4},
+	}
+	boardPostMove = board.ApplyMove(BLACK_PLAYER, move)
+	expectedBoardStr := "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- x - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - O - - -|"
+	assert.Equals(t, boardPostMove.CompactString(false), expectedBoardStr)
 
 }
 

@@ -346,8 +346,6 @@ func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []B
 
 func (board Board) ApplyMove(player Player, move Move) Board {
 
-	// TODO!!! Kinging not supported.  Write test to detect this.
-
 	piece := board.pieceAt(move.from)
 	boardPostMove := NewBoardFromBoard(board)
 
@@ -356,6 +354,13 @@ func (board Board) ApplyMove(player Player, move Move) Board {
 
 	// put the piece in the move.to location
 	boardPostMove[move.to.row][move.to.col] = piece
+
+	// should this piece be promoted to king?
+	if !piece.IsKing() {
+		if board.isOnOpponentsFirstRank(move.to, player) {
+			boardPostMove[move.to.row][move.to.col] = piece.King()
+		}
+	}
 
 	// delete the piece in the middle location (captured)
 	if move.IsJump() {
@@ -371,6 +376,16 @@ func (board Board) ApplyMove(player Player, move Move) Board {
 
 	}
 	return boardPostMove
+}
+
+func (board Board) isOnOpponentsFirstRank(location Location, player Player) bool {
+	switch player {
+	case BLACK_PLAYER:
+		return location.Row() == 7
+	default:
+		return location.Row() == 0
+	}
+
 }
 
 func (board Board) singleJumpMovesForLocation(player Player, loc Location) []Move {
