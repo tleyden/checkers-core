@@ -26,3 +26,8 @@ This powers [checkers-bot-minimax](https://github.com/tleyden/checkers-bot-minim
 # Documentation
 
 [Godocs](http://godoc.org/github.com/tleyden/checkers-core)
+
+# Usage Example
+
+See [checkers-bot-minimax](https://github.com/tleyden/checkers-bot-minimax)
+
