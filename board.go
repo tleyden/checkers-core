@@ -7,8 +7,6 @@ import (
 
 type Board [8][8]Piece
 
-type EvaluationFunction func(player Player, board Board) float64
-
 func NewBoardFromBoard(otherBoard Board) Board {
 	board := Board{}
 	for row := 0; row < 8; row++ {
@@ -136,10 +134,8 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 
 	maxValueSeen := -99999999.0
 	for _, move := range moves {
-		boardPostMove := b.applyMove(p, move)
-		logg.Log("boardPostMove: %v", boardPostMove.CompactString(true))
+		boardPostMove := b.ApplyMove(p, move)
 		boardValue := valueFunction(boardPostMove)
-		logg.Log("boardVal: %v", boardValue)
 		if boardValue > maxValueSeen {
 			maxValueSeen = boardValue
 			m = move
@@ -213,7 +209,7 @@ func (board Board) legalMovesForLocation(p Player, loc Location) (moves []Move, 
 // The result will be sorted descending by the longest jump sequence.
 func (board Board) explodeJumpMove(player Player, startingMove Move) [][]Move {
 
-	boardPostMove := board.applyMove(player, startingMove)
+	boardPostMove := board.ApplyMove(player, startingMove)
 	boardMove := BoardMove{
 		board: boardPostMove,
 		move:  startingMove,
@@ -338,7 +334,7 @@ func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []B
 
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
 	for _, jumpMove := range jumpMoves {
-		boardPostMove := board.applyMove(player, jumpMove)
+		boardPostMove := board.ApplyMove(player, jumpMove)
 		boardMove := BoardMove{
 			board: boardPostMove,
 			move:  jumpMove,
@@ -349,7 +345,7 @@ func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []B
 
 }
 
-func (board Board) applyMove(player Player, move Move) Board {
+func (board Board) ApplyMove(player Player, move Move) Board {
 
 	// TODO!!! Kinging not supported.  Write test to detect this.
 
@@ -533,8 +529,7 @@ Convert to a string that looks like:
 		"|- - - - - - - -|" +
 		"|x - x - o - x -|" +
 		"|- x - x - x - x|" +
-		"
-|x - x - x - x -|"
+		"|x - x - x - x -|"
 
 */
 func (board Board) CompactString(addNewlines bool) string {

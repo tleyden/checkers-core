@@ -157,7 +157,7 @@ func TestApplyMove(t *testing.T) {
 		to:   to,
 		over: over,
 	}
-	boardPostMove := board.applyMove(RED_PLAYER, move)
+	boardPostMove := board.ApplyMove(RED_PLAYER, move)
 	assert.True(t, boardPostMove.pieceAt(from) == EMPTY)
 	assert.True(t, boardPostMove.pieceAt(over) == EMPTY)
 	assert.True(t, boardPostMove.pieceAt(to) == board.pieceAt(from))
@@ -184,7 +184,7 @@ func TestApplyMoveWithSubmoves(t *testing.T) {
 
 	move := moves[0]
 
-	boardPostMove := board.applyMove(RED_PLAYER, move)
+	boardPostMove := board.ApplyMove(RED_PLAYER, move)
 
 	expectedBoardStr := "" +
 		"|- - - - - - - -|" +
@@ -388,9 +388,7 @@ func TestMinimax(t *testing.T) {
 		"|- - - - - - - -|" +
 		"|- - - - - - - -|"
 
-	evalFunc := func(player Player, board Board) float64 {
-		return board.WeightedScore(player)
-	}
+	evalFunc := DefaultEvaluationFunction()
 	board := NewBoard(currentBoardStr)
 	depth := 0
 	_, blackScore := board.Minimax(BLACK_PLAYER, depth, evalFunc)
