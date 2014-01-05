@@ -18,8 +18,9 @@ type Move struct {
 }
 
 type BoardMove struct {
-	board Board
-	move  Move
+	board            Board
+	move             Move
+	kingedDuringJump bool
 }
 
 type MoveFilter func(move Move) bool

@@ -250,11 +250,16 @@ func (board Board) recursiveExplodeJumpMove(player Player, boardMoveSeq []BoardM
 		// fork boardMoveSeq from the initial snapshot and add this jumpMove
 		boardMoveSeq = append(boardMoveSeqSnapshot, jumpMove)
 
-		upstream := boardPostMove.recursiveExplodeJumpMove(
-			player,
-			boardMoveSeq,
-		)
-		upstreamBoardMoveSeqs = append(upstreamBoardMoveSeqs, upstream...)
+		if jumpMove.kingedDuringJump == true {
+			// in this case, stop recursing because we'll be adding invalid moves
+			upstreamBoardMoveSeqs = append(upstreamBoardMoveSeqs, boardMoveSeq)
+		} else {
+			upstream := boardPostMove.recursiveExplodeJumpMove(
+				player,
+				boardMoveSeq,
+			)
+			upstreamBoardMoveSeqs = append(upstreamBoardMoveSeqs, upstream...)
+		}
 
 	}
 
@@ -334,10 +339,20 @@ func (board Board) alternateSingleStepJumpPaths(player Player, loc Location) []B
 	jumpMoves := board.singleJumpMovesForLocation(player, loc)
 	for _, jumpMove := range jumpMoves {
 		boardPostMove := board.ApplyMove(player, jumpMove)
+
 		boardMove := BoardMove{
 			board: boardPostMove,
 			move:  jumpMove,
 		}
+
+		// mark jumps in which the piece has transformed into
+		// a king during the jump.
+		pieceBeforeJump := board.PieceAt(jumpMove.from)
+		pieceAfterJump := boardPostMove.PieceAt(jumpMove.to)
+		if pieceBeforeJump != pieceAfterJump {
+			boardMove.kingedDuringJump = true
+		}
+
 		boardMoves = append(boardMoves, boardMove)
 	}
 	return boardMoves
