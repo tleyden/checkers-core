@@ -427,12 +427,39 @@ func TestMinimax(t *testing.T) {
 	assert.True(t, scorePostMove >= 1.0)
 	assert.Equals(t, bestMove.To(), Location{row: 2, col: 5})
 
-	// TODO: test scenario when the game is over
+	// black has lost the game, so when getting the minimax for that
+	// move it will return final score for black
+	currentBoardStr = "" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - x - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|" +
+		"|- - - - - - - -|"
+	board = NewBoard(currentBoardStr)
+	depth = 1
+	bestMove2, scorePostMove2 := board.Minimax(BLACK_PLAYER, depth, evalFunc)
+	assert.True(t, scorePostMove2 == -1.0)
+	assert.False(t, bestMove2.IsInitialized())
+
+	// http://www.usacheckers.com/famouspositions.php - Third Position
 	/*
-		depth = 5
-		bestMove, scorePostMove = board.Minimax(RED_PLAYER, depth, evalFunc)
-		logg.Log("score: %v", scorePostMove)
-		logg.Log("bestMove: %v", bestMove)
+		currentBoardStr = "" +
+			"|- - - - - - - -|" +
+			"|o - - - - - - -|" +
+			"|- - - - - - - -|" +
+			"|o - x - - - - -|" +
+			"|- - - - - - - -|" +
+			"|o - x - - - - -|" +
+			"|- - - - - - - -|" +
+			"|- - - - - - - -|"
+		board = NewBoard(currentBoardStr)
+		depth = 7
+		bestMove3, scorePostMove3 := board.Minimax(BLACK_PLAYER, depth, evalFunc)
+		logg.Log("score: %v", scorePostMove3)
+		logg.Log("bestMove: %v", bestMove3)
 	*/
 
 }

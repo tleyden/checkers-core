@@ -127,13 +127,13 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 	// If player has no legal moves, panic for now
 	// TODO: fix this
 	if len(moves) == 0 {
-		panic("No legal moves!")
+		score = eval(p, b)
+		return
 	}
 
 	// When there are multiple legal moves available, choose the best one by
 	// maximizing the value of the resulting boards.
 
-	// return max((value(make_move(m, player, list(board))), m) for m in moves)
 	maxValueSeen := -99999999.0
 	for _, move := range moves {
 		boardPostMove := b.applyMove(p, move)
