@@ -232,6 +232,25 @@ func TestLegalMovesKingedWhileJumping(t *testing.T) {
 	assert.False(t, move.to == Location{row: 5, col: 0})
 	assert.True(t, move.to == Location{row: 7, col: 2})
 
+	currentBoardStr = "" +
+		"|- o - o - o - o|" +
+		"|- - o - - - - -|" +
+		"|- o - o - - - -|" +
+		"|- - - - - - - -|" +
+		"|- x - - - - - -|" +
+		"|- - x - o - - -|" +
+		"|- x - x - - - -|" +
+		"|x - - - - - x -|"
+
+	board = NewBoard(currentBoardStr)
+	loc = Location{row: 5, col: 4}
+	moves, _ = board.legalMovesForLocation(BLACK_PLAYER, loc)
+	assert.Equals(t, len(moves), 1)
+	move = moves[0]
+
+	// if its king'ed, it can't keep jumping backwards!
+	assert.False(t, move.to == Location{row: 3, col: 2})
+
 }
 
 func TestApplyMoveWithSubmoves(t *testing.T) {

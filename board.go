@@ -178,7 +178,7 @@ func (board Board) legalMovesForLocation(p Player, loc Location) (moves []Move, 
 	for _, jumpMove := range jumpMoves {
 
 		jumpMoveSequences := board.explodeJumpMove(p, jumpMove)
-		if len(jumpMoveSequences[0]) > 0 {
+		if len(jumpMoveSequences) > 0 && len(jumpMoveSequences[0]) > 0 {
 			for _, moveSequence := range jumpMoveSequences {
 				multiJumpMove := NewMove(moveSequence)
 				moves = append(moves, multiJumpMove)
@@ -209,6 +209,15 @@ func (board Board) legalMovesForLocation(p Player, loc Location) (moves []Move, 
 func (board Board) explodeJumpMove(player Player, startingMove Move) [][]Move {
 
 	boardPostMove := board.ApplyMove(player, startingMove)
+
+	// if the piece has transformed into a king during the jump.
+	// then the move cannot be exploded
+	pieceBeforeJump := board.PieceAt(startingMove.from)
+	pieceAfterJump := boardPostMove.PieceAt(startingMove.to)
+	if pieceBeforeJump != pieceAfterJump {
+		return [][]Move{}
+	}
+
 	boardMove := BoardMove{
 		board: boardPostMove,
 		move:  startingMove,
