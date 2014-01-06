@@ -21,7 +21,7 @@ It includes a lexer (based on [Rob Pike's lexer](http://www.youtube.com/watch?v=
 
 And boards can be exported into the same compact string representations.  
 
-This powers [checkers-bot-minimax](https://github.com/tleyden/checkers-bot-minimax), but should be re-usable in other contexts. 
+This powers [checkers-bot-minimax](https://github.com/tleyden/checkers-bot-minimax) and [checkerlution](https://github.com/tleyden/checkerlution), but should be re-usable in other contexts. 
 
 # Documentation
 
