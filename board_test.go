@@ -250,6 +250,7 @@ func TestLegalMovesKingedWhileJumping(t *testing.T) {
 
 	// if its king'ed, it can't keep jumping backwards!
 	assert.False(t, move.to == Location{row: 3, col: 2})
+	assert.True(t, move.to == Location{row: 7, col: 2})
 
 }
 
