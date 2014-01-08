@@ -73,19 +73,6 @@ const (
 
 const eof = -1
 
-func (i item) String() string {
-	switch i.typ {
-	case itemEOF:
-		return "EOF"
-	case itemError:
-		return i.val
-	}
-	if len(i.val) > 10 {
-		return fmt.Sprintf("%.10q...", i.val)
-	}
-	return fmt.Sprintf("%q", i.val)
-}
-
 func lex(name, input string) (*lexer, chan item) {
 	l := &lexer{
 		name:  name,
@@ -192,4 +179,17 @@ func (l *lexer) backup() {
 // isSpace reports whether r is a space character.
 func isSpace(r rune) bool {
 	return r == ' ' || r == '\t'
+}
+
+func (i item) String() string {
+	switch i.typ {
+	case itemEOF:
+		return "EOF"
+	case itemError:
+		return i.val
+	}
+	if len(i.val) > 10 {
+		return fmt.Sprintf("%.10q...", i.val)
+	}
+	return fmt.Sprintf("%q", i.val)
 }
