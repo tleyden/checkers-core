@@ -146,20 +146,45 @@ func (b Board) Minimax(p Player, depth int, eval EvaluationFunction) (m Move, sc
 
 }
 
-// Compute the difference between the sum of the weights of player's
-// squares and the sum of the weights of opponent's squares.
-func (board Board) WeightedScore(player Player) float64 {
+func (board Board) WeightedScoreFiltered(player Player, filter func(piece Piece) bool) float64 {
+
 	total := 0.0
 	calculateLocationValue := func(loc Location) {
 		piece := board.PieceAt(loc)
-		if piece.OwnedBy(player) {
-			total += piece.WeightedValue()
-		} else {
-			total -= piece.WeightedValue()
+		if filter(piece) {
+			if piece.OwnedBy(player) {
+				total += piece.WeightedValue()
+			} else {
+				total -= piece.WeightedValue()
+			}
 		}
 	}
 	board.applyEachSquare(calculateLocationValue)
 	return total
+
+}
+
+// Compute the difference between the sum of the weights of player's
+// squares and the sum of the weights of opponent's squares.
+func (board Board) WeightedScore(player Player) float64 {
+	filter := func(piece Piece) bool {
+		return true
+	}
+	return board.WeightedScoreFiltered(player, filter)
+}
+
+func (board Board) WeightedScorePiecesOnly(player Player) float64 {
+	filter := func(piece Piece) bool {
+		return !piece.IsKing()
+	}
+	return board.WeightedScoreFiltered(player, filter)
+}
+
+func (board Board) WeightedScoreKingsOnly(player Player) float64 {
+	filter := func(piece Piece) bool {
+		return piece.IsKing()
+	}
+	return board.WeightedScoreFiltered(player, filter)
 }
 
 func (board Board) applyEachSquare(f func(loc Location)) {
